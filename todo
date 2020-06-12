@@ -1,0 +1,13 @@
+- File system
+    - .env
+        - Test and verify
+        - Remove token.txt
+        - Regenerate new token
+        - Repeat for brawl stars API
+    - Client file
+        - Separate file for bot and client
+        - Separate module for puzzles
+        - Separate module for card collecting
+        - Separate module for adventure game tm
+    - Bot
+        - Change prefix

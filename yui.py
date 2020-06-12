@@ -1,4 +1,4 @@
-from discord import Client
+from discord import Client, ActivityType, Activity
 from asyncio import sleep
 from random import choice
 
@@ -12,6 +12,12 @@ async def on_ready():
             print(
                 f"{client.user} is here to fix bugs and cause chaos. And she's"
                 f" all out of bugs."
+            )
+            await client.change_presence(
+                activity=Activity(
+                    name="your mental health | .help",
+                    type=ActivityType.watching
+                )
             )
             break
 
