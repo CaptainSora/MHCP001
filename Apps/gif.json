@@ -1,15 +1,25 @@
 {
-    "good bot": "Images/yui.gif",
-    "rip": "Images/rip.gif",
-    "ded": "Images/f.gif",
-    "delete": "Images/eraser.gif",
-    "happy": "Images/happi.gif",
-    "nom": "Images/nom.gif",
-    "bread": "Images/bread.gif",
-    "sleepy": "Images/slep.gif",
-    "srs": "Images/srs.gif",
-    "glare": "Images/glare.gif",
-    "yikes": "Images/yikes.gif",
-    "slap": "Images/slap.gif",
-    "nade nade": "Images/nade_nade.gif"
+    "good bot": [
+        "https://cdn.discordapp.com/attachments/720754763955830834/721209069754646548/yui.gif",
+        "https://cdn.discordapp.com/attachments/720754763955830834/721211207201325136/yui_come.gif"
+    ],
+    "rip": "https://cdn.discordapp.com/attachments/720754763955830834/721209117502341200/rip.gif",
+    "ded": "https://cdn.discordapp.com/attachments/720754763955830834/721209153325891645/f.gif",
+    "delete": "https://cdn.discordapp.com/attachments/720754763955830834/721209159814742025/eraser.gif",
+    "happy": "https://cdn.discordapp.com/attachments/720754763955830834/721209219428384888/happi.gif",
+    "nom": "https://cdn.discordapp.com/attachments/720754763955830834/721209222951469066/nom.gif",
+    "bread": "https://cdn.discordapp.com/attachments/720754763955830834/721209225346416680/bread.gif",
+    "sleepy": "https://cdn.discordapp.com/attachments/720754763955830834/721209316253892748/slep.gif",
+    "srs": "https://cdn.discordapp.com/attachments/720754763955830834/721209322134044742/srs.gif",
+    "glare": "https://cdn.discordapp.com/attachments/720754763955830834/721209324864667768/glare.gif",
+    "yikes": "https://cdn.discordapp.com/attachments/720754763955830834/721209387271585813/yikes.gif",
+    "slap": "https://cdn.discordapp.com/attachments/720754763955830834/721209413163155456/slap.gif",
+    "nade nade": "https://cdn.discordapp.com/attachments/720754763955830834/721204637700718652/nade_nade.gif",
+    "sad": "https://cdn.discordapp.com/attachments/720754763955830834/721210115817996308/cri.gif",
+    "hug": "https://giffiles.alphacoders.com/131/131829.gif",
+    "rawr": "https://cdn.discordapp.com/attachments/720754763955830834/721211590136823838/rawr.gif",
+    "die": "https://qph.fs.quoracdn.net/main-qimg-e050f02f588188eb745a3e0e0b2e5b8b",
+    "oof": "https://vignette.wikia.nocookie.net/swordartonline/images/f/ff/Asuna_slaps_Kirito.png/revision/latest?cb=20140330074555",
+    "op": "https://i1.wp.com/oliviascatastrophe.com/wp-content/uploads/2018/12/giphy-6.gif?resize=500%2C281&ssl=1",
+    "trap": "https://wrongeverytime.files.wordpress.com/2014/10/horriblesubs-sword-art-online-ii-16-720p-mkv_snapshot_15-21_2014-10-25_14-28-47.jpg?w=1400"
 }

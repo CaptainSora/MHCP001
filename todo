@@ -11,3 +11,16 @@
         - Separate module for adventure game tm
     - Bot
         - Change prefix
+    - Bank
+        - Untouchable (lottery)
+            - Change payout text?
+        - Shop
+        - Interest? (Daily)
+            - Tier
+        - Stocks
+            - use randomgen, bounded in interval?
+            - maybe not true random, but trended?
+    - SAO Gacha
+        - Tie into card game?
+        - Get card art from SAOMD
+        - 
