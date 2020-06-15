@@ -1,7 +1,7 @@
 - File system
     - .env
-        - Test and verify
-        - Remove token.txt
+        - Test and verify @done
+        - Remove token.txt @done
         - Regenerate new token
         - Repeat for brawl stars API
     - Client file
@@ -15,12 +15,13 @@
         - Untouchable (lottery)
             - Change payout text?
         - Shop
-        - Interest? (Daily)
-            - Tier
+        - Interest? (Daily) @done
+            - Tier @done
         - Stocks
             - use randomgen, bounded in interval?
             - maybe not true random, but trended?
     - SAO Gacha
         - Tie into card game?
         - Get card art from SAOMD
-        - 
+        - Daily card?
+    - Adventure game

@@ -16,9 +16,11 @@ TOKEN = getenv('API_ACCESS')
 
 bot = commands.Bot(command_prefix='.')
 
+dict_ready = False
+
 @bot.event
 async def on_ready():
-    global emote_dict, gif_dict, react_dict
+    global emote_dict, gif_dict, react_dict, dict_ready
     print(
         f"{bot.user.name} is here to fix bugs and cause chaos. And she's"
         f" all out of bugs."
@@ -35,6 +37,7 @@ async def on_ready():
         gif_dict = load(f)
     with open('Apps/react.json') as f:
         react_dict = load(f)
+    dict_ready = True
 
 
 @bot.command(name='poke')
@@ -47,11 +50,15 @@ async def emote(ctx):
 
 @bot.command(name='emotes', help='Displays a list of all emotes')
 async def emotes(ctx):
-    await ctx.send('\n'.join(list(emote_dict.keys())))
+    await ctx.send('\n'.join(sorted(list(emote_dict.keys()))))
 
 @bot.command(name='gifs', help='Displays a list of all gifs')
 async def gifs(ctx):
-    await ctx.send('\n'.join(list(gif_dict.keys())))
+    entries = sorted([str(x) for x in gif_dict.keys()])
+    for i in range(len(entries)):
+        if type(gif_dict[entries[i]]) == type([]):
+            entries[i] += f' ({len(gif_dict[entries[i]])})'
+    await ctx.send('\n'.join(entries))
 
 @bot.command(name='bank', aliases=['b'], help='bank game')
 async def bank_wrapper(ctx, *args):
@@ -75,20 +82,23 @@ async def logout(ctx):
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:
+    if message.author == bot.user or not dict_ready:
         return
     for k in emote_dict:
         if k in message.content.lower():
-            emoji = get(bot.emojis, name=emote_dict[k])
-            await message.channel.send(emoji)
-            break
+            if (":" + emote_dict[k] + ":") not in message.content.lower():
+                emoji = get(bot.emojis, name=emote_dict[k])
+                await message.channel.send(emoji)
+                break
     for k in gif_dict:
-        if k in message.content.lower():
+        if k == message.content.lower():
             url = gif_dict[k]
             if type(url) == type([]):
                 url = choice(url)
             embed = Embed()
             embed.set_image(url=url)
+            # embed.set_footer(text=k)
+            # await message.delete()
             await message.channel.send(embed=embed)
     for k in react_dict:
         if k in message.content.lower():

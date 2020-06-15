@@ -58,7 +58,7 @@ async def new_user(ctx, bank_dict, userid):
                 "last_collected": str(cur_time.date())
             },
             "untouchable": {
-                "wins": [0, 0, 0, 0, 0, 0],
+                "wins": [0, 0, 0, 0, 0, 0, 0],
                 "last_played": str(cur_time)
             }
         }
@@ -102,6 +102,7 @@ async def interest(ctx, bank_dict, userid):
             f"You can claim again in {mins_left // 60}h {mins_left % 60}m."
         )
     else:
+        bank_dict[userid]['last_collected'] = cur_date
         bank_dict[userid]['cor'] += interest_earned
         bank_dict[userid]['interest']['tier'] += 1
         text = f"Collected {interest_earned} Cor"

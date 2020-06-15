@@ -4,9 +4,15 @@
         "https://cdn.discordapp.com/attachments/720754763955830834/721211207201325136/yui_come.gif"
     ],
     "rip": "https://cdn.discordapp.com/attachments/720754763955830834/721209117502341200/rip.gif",
-    "ded": "https://cdn.discordapp.com/attachments/720754763955830834/721209153325891645/f.gif",
+    "ded": [
+        "https://cdn.discordapp.com/attachments/720754763955830834/721209153325891645/f.gif",
+        "https://i.ytimg.com/vi/jl9xKw_xEas/maxresdefault.jpg"
+    ],
     "delete": "https://cdn.discordapp.com/attachments/720754763955830834/721209159814742025/eraser.gif",
-    "happy": "https://cdn.discordapp.com/attachments/720754763955830834/721209219428384888/happi.gif",
+    "happy": [
+        "https://cdn.discordapp.com/attachments/720754763955830834/721209219428384888/happi.gif",
+        "https://i.pinimg.com/originals/91/0e/47/910e470c121f670b50dbebd215924fe0.gif"
+    ],
     "nom": "https://cdn.discordapp.com/attachments/720754763955830834/721209222951469066/nom.gif",
     "bread": "https://cdn.discordapp.com/attachments/720754763955830834/721209225346416680/bread.gif",
     "sleepy": "https://cdn.discordapp.com/attachments/720754763955830834/721209316253892748/slep.gif",
@@ -21,5 +27,25 @@
     "die": "https://qph.fs.quoracdn.net/main-qimg-e050f02f588188eb745a3e0e0b2e5b8b",
     "oof": "https://vignette.wikia.nocookie.net/swordartonline/images/f/ff/Asuna_slaps_Kirito.png/revision/latest?cb=20140330074555",
     "op": "https://i1.wp.com/oliviascatastrophe.com/wp-content/uploads/2018/12/giphy-6.gif?resize=500%2C281&ssl=1",
-    "trap": "https://wrongeverytime.files.wordpress.com/2014/10/horriblesubs-sword-art-online-ii-16-720p-mkv_snapshot_15-21_2014-10-25_14-28-47.jpg?w=1400"
+    "trap": "https://wrongeverytime.files.wordpress.com/2014/10/horriblesubs-sword-art-online-ii-16-720p-mkv_snapshot_15-21_2014-10-25_14-28-47.jpg?w=1400",
+    "ojou": "https://66.media.tumblr.com/9adf597593b7be529f502fb958908322/a2d9cfdc088c9db3-c1/s640x960/606011ab1221e3e196e246ba279fe3edfdb1f15c.gif",
+    "pout": "https://pbs.twimg.com/media/D0gdPGJXQAMbUJt.jpg",
+    "nice": "https://media1.tenor.com/images/6c2ef92bbb64009304fb84d8b55b537b/tenor.gif?itemid=14210792",
+    "moneys": "https://i.imgur.com/E6hzJv2.gif",
+    "moneyslap": "https://i.imgur.com/Tu3uNiE.gif?noredirect",
+    "america explain": "https://media1.tenor.com/images/b55f2a57aea646913d01c614864dea6b/tenor.gif?itemid=11525000",
+    "bruh": "https://www.memecreator.org/static/images/templates/2229219.jpg",
+    "hackerman": "https://media.giphy.com/media/RyXVu4ZW454IM/200_d.gif",
+    "charlotte": "https://www.kindpng.com/picc/m/16-165695_charlotte-anime-meme-face-hd-png-download.png",
+    "geh": "https://i.makeagif.com/media/2-20-2018/2Ry5AV.gif",
+    "how bout i do anyway": "https://i.imgflip.com/2kviqn.jpg",
+    "eep": "https://66.media.tumblr.com/dc0519d635e38d18a15481030b4d848f/tumblr_inline_nnjelpE2OB1r6p6nw_500.gif",
+    "objection": "https://steamuserimages-a.akamaihd.net/ugc/934940807283554697/60E8C1F225DB7527B2D3B6FCA1705A9233367289/",
+    "help": "https://media1.giphy.com/media/FGbEffWs9la1O/giphy.gif",
+    "yatta": "https://media.tenor.com/images/25bd7d79a60162b6a7a35bf473286124/tenor.gif",
+    "no u": "https://i.kym-cdn.com/photos/images/newsfeed/001/441/633/3c5.jpg",
+    "uno reverse": "https://pm1.narvii.com/7150/411c1aa63393c23ee4b444e0d05f1b0e75545653r1-248-380v2_00.jpg",
+    "plotting": "https://38.media.tumblr.com/1efa5623ea54c07fcbad10652ec40017/tumblr_nvnx13u4S61se9ejko1_540.gif",
+    "sigh": "https://media.tenor.com/images/83b3ee19639fa044d934c54cbc407c9b/tenor.gif",
+    "gundere": "https://media1.tenor.com/images/4164506fc74c0731c80aaf89f331f959/tenor.gif?itemid=14778256"
 }
