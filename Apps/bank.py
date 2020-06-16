@@ -4,6 +4,11 @@ from math import ceil
 
 from discord import Embed
 
+def id(user):
+    return '#'.join([str(user.name), str(user.discriminator)])
+
+async def utc_time(ctx):
+    await ctx.send(datetime.now(timezone.utc).strftime('%H:%M:%S') + ' UTC')
 
 async def bank(ctx, args):
     """
@@ -12,7 +17,7 @@ async def bank(ctx, args):
     with open('Apps/bank.json') as f:
         bank_dict = load(f)
     user = ctx.message.author
-    userid = '#'.join([str(user.name), str(user.discriminator)])
+    userid = id(user)
     if len(args) == 0:
         # Initialize user
         await new_user(ctx, bank_dict, userid)
@@ -102,7 +107,7 @@ async def interest(ctx, bank_dict, userid):
             f"You can claim again in {mins_left // 60}h {mins_left % 60}m."
         )
     else:
-        bank_dict[userid]['last_collected'] = cur_date
+        bank_dict[userid]['interest']['last_collected'] = cur_date
         bank_dict[userid]['cor'] += interest_earned
         bank_dict[userid]['interest']['tier'] += 1
         text = f"Collected {interest_earned} Cor"
@@ -116,17 +121,34 @@ async def user_exists(userid):
         bank_dict = load(f)
     return userid in bank_dict
 
-# async def add_balance(userid, value):
-#     """
-#     Adds value to userid's bank balance.
-#     """
-#     with open('Apps/bank.json') as f:
-#         bank_dict = load(f)
-#     if userid not in bank_dict:
-#         return 1
-#     if not str(value).isdecimal():
-#         return 2
-#     bank_dict[userid]['col'] += int(value)
-#     with open('Apps/bank.json', 'w') as f:
-#         dump(bank_dict, f)
-#     return 0
+# Used for stocks
+async def purchase(userid, value, objtype=None, obj=None, qty=None):
+    """
+    Adds value to userid's bank balance. Value can be + or -.
+    Optionally adds an object of objtype, with name obj, with amount qty
+    to user's inventory.
+    """
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
+    if userid not in bank_dict:
+        return 1  # User does not exist
+    if not str(value).isdecimal():
+        return 2  # Value must be numeric
+    if bank_dict[userid]['col'] + int(value) < 0:
+        return 3  # Cannot request more than in bank
+    if objtype is not None:
+        if obj is None or qty is None:
+            return 4  # Require all optional arguments
+        if not str(qty).isdecimal():
+            return 5  # Qty must be numeric
+        if objtype not in bank_dict[userid]:
+            bank_dict[userid][objtype] = {}
+        if obj not in bank_dict[userid][objtype]:
+            bank_dict[userid][objtype][obj] = 0
+        if bank_dict[userid][objtype][obj] + int(qty) < 0:
+            return 6  # Cannot request more than owned
+        bank_dict[userid][objtype][obj] = int(qty)
+    bank_dict[userid]['col'] += int(value)
+    with open('Apps/bank.json', 'w') as f:
+        dump(bank_dict, f)
+    return 0

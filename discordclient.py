@@ -9,6 +9,7 @@ from discord.utils import get
 from dotenv import load_dotenv
 
 import Apps.bank
+import Apps.stocks
 import Apps.untouchable
 
 load_dotenv()
@@ -60,6 +61,10 @@ async def gifs(ctx):
             entries[i] += f' ({len(gif_dict[entries[i]])})'
     await ctx.send('\n'.join(entries))
 
+@bot.command(name='time', aliases=['now', 't', 'utc'])
+async def utc_time_wrapper(ctx, *args):
+    await Apps.bank.utc_time(ctx)
+
 @bot.command(name='bank', aliases=['b'], help='bank game')
 async def bank_wrapper(ctx, *args):
     await Apps.bank.bank(ctx, args)
@@ -71,6 +76,14 @@ async def bank_wrapper(ctx, *args):
 )
 async def untouchable_wrapper(ctx, *args):
     await Apps.untouchable.untouchable(ctx, args)
+
+@bot.command(
+    name='stocks',
+    aliases=['stock', 's'],
+    help='Invest in the stock market!'
+)
+async def stocks_wrapper(ctx, *args):
+    await Apps.stocks.stocks(ctx, args)
 
 @bot.command(name='logout', help='Admin command')
 @commands.is_owner()

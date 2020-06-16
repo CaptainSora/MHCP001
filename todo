@@ -12,16 +12,33 @@
     - Bot
         - Change prefix
     - Bank
-        - Untouchable (lottery)
+        - Untouchable (lottery) @done
             - Change payout text?
-        - Shop
+        - Shop 
+            - Might require cards to be set up
         - Interest? (Daily) @done
             - Tier @done
         - Stocks
             - use randomgen, bounded in interval?
             - maybe not true random, but trended?
+            - Fixed number buying/selling
+                - Refreshes per hour
     - SAO Gacha
         - Tie into card game?
         - Get card art from SAOMD
         - Daily card?
+        - Raid boss
+            - All players can attack (with certain cooldown?)
+            - Rewards distributed only if boss is defeated
+                - Rewards based on percentage damage dealt?
+        - Monster encounter
+            - Only trigger user can attack
     - Adventure game
+- Documentation
+    - All of it please thanks
+    - Files
+        - Docstrings
+            - Module level
+            - Function level
+        - PEP-8 Compliance
+    - Sphinx ReadtheDocs

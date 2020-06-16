@@ -7,7 +7,7 @@ from dateutil import tz
 from dateutil.parser import parse
 from discord import Embed
 
-from Apps.bank import new_user, user_exists
+from Apps.bank import id, new_user, user_exists
 
 # E(X) = 207 Cor
 PAYOUTS = {
@@ -22,9 +22,6 @@ PAYOUTS = {
 
 def binom(n, p, k):
     return comb(n, k) * pow(p, k) * pow((1-p), (n-k))
-
-def id(user):
-    return '#'.join([str(user.name), str(user.discriminator)])
 
 async def instructions(ctx, embed):
     embed.add_field(
