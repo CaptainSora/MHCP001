@@ -86,7 +86,7 @@ async def history(ctx, embed, userid, userdata):
         if wins > 0:
             p = binom(6, 0.1, i)
             exp = sum(win_array) * p
-            stdev = sqrt(sum(win_array) * p**2)
+            stdev = sqrt(sum(win_array) * p * (1 - p))
             z = (wins - exp) / stdev
             value += f' ({z:+.2f}σ)' 
         embed.add_field(name=f'{i} matches', value=value, inline=True)

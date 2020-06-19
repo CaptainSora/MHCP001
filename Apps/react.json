@@ -1,6 +1,8 @@
 {
     "f": {
-        "exact": true,
         "unicode": "0001f1eb"
+    },
+    "shit": {
+        "name": "poop"
     }
 }

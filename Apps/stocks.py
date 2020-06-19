@@ -12,7 +12,8 @@ from dateutil import tz
 from dateutil.parser import parse
 from datetime import datetime, timezone
 import numpy as np
-from Apps.bank import id
+from Apps.bank import id, user_exists, new_user
+from discord import Embed
 
 def stock_home_value(stock_brief):
     """
@@ -93,8 +94,21 @@ async def trade(ctx, embed, stock_brief, qty):
     pass
 
 async def stocks(ctx, args):
+    # Update stock information
+    check_history()
     with open('Apps/stocks.json') as f:
         stock_history = load(f)
+    user = ctx.message.author
+    userid = id(user)
+    # User checks
+    if not await user_exists(userid):
+        await new_user(ctx, bank_dict, userid)
+    # Embed
+    embed=Embed(
+        title='Aincrad Stock Exchange',
+        description='Good credit? Bad credit? No credit? No problem!',
+        colour=0x140088
+    )
 
 # for s in sorted(['NVG', 'AUG', 'AMS', 'STL', 'MCB']):
 #     print(stock_home_value(s), new_value(stock_home_value(s), s))

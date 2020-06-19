@@ -11,7 +11,13 @@
         - Separate module for adventure game tm
     - Bot
         - Change prefix
+        - Yui onboarding
+            - Create channel section for yui-related
+            - Separate channels for diff activities
+            - Onboarding channel in general text
     - Bank
+        - Change "new_user" to standalone not requiring bank_dict
+        - MODULAR DESIGN DAMMIT
         - Untouchable (lottery) @done
             - Change payout text?
         - Shop 
@@ -23,6 +29,11 @@
             - maybe not true random, but trended?
             - Fixed number buying/selling
                 - Refreshes per hour
+        - Gambling
+            - Roulette
+            - Slots
+            - Blackjack
+            - etc.
     - SAO Gacha
         - Tie into card game?
         - Get card art from SAOMD
@@ -31,8 +42,37 @@
             - All players can attack (with certain cooldown?)
             - Rewards distributed only if boss is defeated
                 - Rewards based on percentage damage dealt?
-        - Monster encounter
+        - Monster encounter (certain cost?)
             - Only trigger user can attack
+        - Random monster sightings (maybe on quest-like board?)
+            - Whoever first attacks it gets it
+        - Battle mechanic
+            - RPSLS-style
+            - Stab/thrust beats slash, weakly beats guard
+            - Slash beats guard, weakly beats counter
+            - Guard beats counter, weakly beats parry
+            - Counter beats parry, weakly beats stab/thrust
+            - Parry beats stab/thrust, weakly beats slash
+            - Different monsters can have different usage rates and resistances
+                to certain attack types
+            - Beats = 2x, weakly beats = 1.5x
+                - Need to consider exact interactions
+                - I.e. defensive moves do damage only if successful?
+                - Consider: beats = 1.5/0, weakly beats = 1/0, neither = 1/1
+            - Other ideas:
+                - Charge doubles(?) next move damage, attacks cancel it
+                - Heal restores hp, can be stopped by attacks and counter?
+                    - Consumes item?
+                - 
+        - Character mechanic
+            - Has stats (atk, def, spd, str, int)
+            - Stab/thrust boosted by Atk/Spd
+            - Slash boosted by Atk/Str
+            - Guard boosted by Def/Str
+            - Counter boosted by Def/Int
+            - Parry boosted by Int/Spd
+            - If runs out of HP, has a cooldown period before starting healing
+                - Otherwise starts healing immediately
     - Adventure game
 - Documentation
     - All of it please thanks

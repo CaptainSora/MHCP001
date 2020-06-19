@@ -98,7 +98,7 @@ async def on_message(message):
     if message.author == bot.user or not dict_ready:
         return
     for k in emote_dict:
-        if k in message.content.lower():
+        if k in message.content.lower().split():
             if (":" + emote_dict[k] + ":") not in message.content.lower():
                 emoji = get(bot.emojis, name=emote_dict[k])
                 await message.channel.send(emoji)
@@ -114,12 +114,21 @@ async def on_message(message):
             # await message.delete()
             await message.channel.send(embed=embed)
     for k in react_dict:
-        if k in message.content.lower():
-            if 'exact' in react_dict[k] and k != message.content.lower():
-                continue
+        if k in message.content.lower().split():
+            # Check for message exact requirement
+            # Deprecated
+            # if 'exact' in react_dict[k]:
+            #     if k != message.content.lower():
+            #         continue
+            # else:
+            #     if k not in message.content.lower().split():
+            #         continue
             for k, v in react_dict[k].items():
                 if k == 'unicode':
                     await message.add_reaction(chr(int(v, base=16)))
+                elif k == 'name':
+                    emoji = get(bot.emojis, name=v)
+                    await message.add_reaction(emoji)
     await bot.process_commands(message)  # NECESSARY TO NOT BREAK COMMANDS
 
 bot.run(TOKEN)
