@@ -14,65 +14,71 @@ async def bank(ctx, args):
     """
     Calls the appropriate function, and saves data to file.
     """
-    with open('Apps/bank.json') as f:
-        bank_dict = load(f)
     user = ctx.message.author
     userid = id(user)
+    await new_user(ctx, userid)  # Initialize user, if not exists
     if len(args) == 0:
-        # Initialize user
-        await new_user(ctx, bank_dict, userid)
+        # Display balance
+        await balance(ctx, userid)
     elif args[0] in ['help', 'h']:
         await bankhelp()
-    elif args[0] in ['balance', 'b']:
-        # Display balance
-        await balance(ctx, bank_dict, userid)
     elif args[0] in ['claim', 'interest', 'c', 'i']:
-        await interest(ctx, bank_dict, userid)
+        await interest(ctx, userid)
     else:
-        print("Invalid arguments")
-    with open('Apps/bank.json', 'w') as f:
-        dump(bank_dict, f)
-
+        print("bank.py, bank(): Invalid arguments")
 
 async def bankhelp():
     pass
 
-async def new_user(ctx, bank_dict, userid):
-    """Initializes a new user"""
+async def new_user(ctx, userid):
+    """
+    Initializes a new user, if necessary. Safe to call on existing users.
+    Returns True if new user was created, False otherwise.
+    Please ensure that you read a new copy of bank_dict after calling new_user.
+    """
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
     if userid in bank_dict:
         # Existing user
-        await balance(ctx, bank_dict, userid)
-    else:
-        embed = Embed(
-            title='Bank of Aincrad',
-            description=(
-                "Hello and welcome to the Bank of Aincrad!\n"
-                "As this is your first time here, please take this welcome "
-                "bonus of 100 Cor!\n"
-                "Please feel free to use `.bankhelp` to see what services we "
-                "offer, and don't forget to claim your interest daily with "
-                "`.bank claim`!"
-            ),
-            colour=0xffff33
-        )
-        cur_time = datetime.now(timezone.utc)
-        bank_dict[userid] = {
-            "cor": 100,
-            "interest": {
-                "tier": 0,
-                "last_collected": str(cur_time.date())
-            },
-            "untouchable": {
-                "wins": [0, 0, 0, 0, 0, 0, 0],
-                "last_played": str(cur_time)
-            }
+        return False
+    embed = Embed(
+        title='Bank of Aincrad',
+        description=(
+            "Hello and welcome to the Bank of Aincrad!\n"
+            "As this is your first time here, please take this welcome "
+            "bonus of 100 Cor!\n"
+            "Please feel free to use `.bankhelp` to see what services we "
+            "offer, and don't forget to claim your interest daily with "
+            "`.bank claim`!"
+        ),
+        colour=0xffff33
+    )
+    cur_time = datetime.now(timezone.utc)
+    bank_dict[userid] = {
+        "cor": 100,
+        "interest": {
+            "tier": 0,
+            "last_collected": str(cur_time.date())
+        },
+        "untouchable": {
+            "wins": [0, 0, 0, 0, 0, 0, 0],
+            "last_played": str(cur_time)
         }
-        await ctx.send(embed=embed)
+    }
+    await ctx.send(embed=embed)
+    with open('Apps/bank.json', 'w') as f:
+        dump(bank_dict, f)
+    return True
 
-async def balance(ctx, bank_dict, userid):
+async def balance(ctx, userid):
+    """
+    Prints the balance for the user, and checks if their interest is claimable.
+    Requires: userid in bank_dict
+    """
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
     if userid not in bank_dict:
-        await new_user(ctx, bank_dict, userid)
-        return
+        return False
     embed = Embed(
         title='Bank of Aincrad',
         description=f'Balance for {userid}',
@@ -84,15 +90,23 @@ async def balance(ctx, bank_dict, userid):
         embed.add_field(name='Interest', value='Claimable!')
     await ctx.send(embed=embed)
 
-async def interest(ctx, bank_dict, userid):
+# Edits bank.json
+async def interest(ctx, userid):
+    """
+    Earns daily interest.
+    """
+    # Read in data
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
     if userid not in bank_dict:
-        await new_user(ctx, bank_dict, userid)
-        return
+        return False
+    # Embed
     embed = Embed(
         title='Bank of Aincrad',
         description=f'Daily Interest for {userid}',
         colour=0xffff33
     )
+    # Calculation
     cur_date = str(datetime.now(timezone.utc).date())
     balance = max(1, bank_dict[userid]['cor'])
     tier = bank_dict[userid]['interest']['tier']
@@ -115,13 +129,12 @@ async def interest(ctx, bank_dict, userid):
     embed.add_field(name='Loyalty', value=f'{tier} days', inline=False)
     embed.add_field(name='Interest Rate', value=f'{interest_rate:.3f}%')
     await ctx.send(embed=embed)
-
-async def user_exists(userid):
-    with open('Apps/bank.json') as f:
-        bank_dict = load(f)
-    return userid in bank_dict
+    # Save data
+    with open('Apps/bank.json', 'w') as f:
+        dump(bank_dict, f)
 
 # Used for stocks
+# Edits bank.json
 async def purchase(userid, value, objtype=None, obj=None, qty=None):
     """
     Adds value to userid's bank balance. Value can be + or -.
@@ -147,7 +160,7 @@ async def purchase(userid, value, objtype=None, obj=None, qty=None):
             bank_dict[userid][objtype][obj] = 0
         if bank_dict[userid][objtype][obj] + int(qty) < 0:
             return 6  # Cannot request more than owned
-        bank_dict[userid][objtype][obj] = int(qty)
+        bank_dict[userid][objtype][obj] += int(qty)
     bank_dict[userid]['col'] += int(value)
     with open('Apps/bank.json', 'w') as f:
         dump(bank_dict, f)

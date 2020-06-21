@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta, timezone
-from random import randrange
 from json import dump, load
 from math import comb, sqrt
+from random import randrange
 
 from dateutil import tz
 from dateutil.parser import parse
 from discord import Embed
+from discord.utils import get
 
-from Apps.bank import id, new_user, user_exists
+from Apps.bank import id, new_user
 
 # E(X) = 207 Cor
 PAYOUTS = {
@@ -90,23 +91,17 @@ async def history(ctx, embed, userid, userdata):
             z = (wins - exp) / stdev
             value += f' ({z:+.2f}σ)' 
         embed.add_field(name=f'{i} matches', value=value, inline=True)
-    cor_exp = sum(PAYOUTS[k] * binom(6, 0.1, k) for k in range(7))
     cor_true = sum(PAYOUTS[k] * win_array[k] for k in range(7))
-    cor_diff = cor_true - sum(win_array) * cor_exp
+    embed.add_field(name='\u200b', value='\u200b')
     embed.add_field(name='\u200b', value='\u200b')
     embed.add_field(
-        name='Total Plays',
+        name='Total draws',
         value=str(sum(win_array))
     )
     embed.add_field(
-        name='Expected payout',
-        value=f'{sum(win_array) *cor_exp:,.0f}'
-    )
-    embed.add_field(
-        name='Actual payout',
+        name='Lifetime winnings',
         value=f'{cor_true:,}'
     )
-    embed.add_field(name='Payout difference', value=f'{cor_diff:+,.0f}')
     await ctx.send(embed=embed)
 
 async def leaderboards(ctx, embed, bank_dict, num=-1):
@@ -115,7 +110,7 @@ async def leaderboards(ctx, embed, bank_dict, num=-1):
     """
     lb = []
     if num < -1 or num > 6:
-        await ctx.send("Invalid argument.")
+        await ctx.send("untouchable.py, leaderboards(): Invalid argument.")
     else:
         # Load player data
         for user in bank_dict:
@@ -145,16 +140,75 @@ async def leaderboards(ctx, embed, bank_dict, num=-1):
             embed.add_field(name=title, value=text, inline=False)
         await ctx.send(embed=embed)
 
+async def percentile(ctx, embed, userid, userdata, emotes):
+    message = await ctx.send("Running simulations...")
+    wins = userdata['untouchable']['wins']
+    winnings = sum(wins[k] * PAYOUTS[k] for k in range(7))
+    total_simulations = 10000
+    montecarlo = []
+    for _ in range(total_simulations):
+        total = 0
+        for _ in range(sum(wins)):
+            guess = f'{randrange(1000000):06}'
+            lotto = f'{randrange(1000000):06}'
+            matches = sum(a == b for a, b in zip(str(guess), lotto))
+            total += PAYOUTS[matches]
+        montecarlo.append(total)
+    percentile = (
+        len([x for x in montecarlo if x <= winnings]) / total_simulations * 100
+    )
+    montecarlo.sort()
+    embed.description = (
+        f'Monte Carlo simulation of luck for {userid}'
+        f' ({total_simulations:,} trials)'
+    )
+    embed.add_field(
+        name="25th percentile",
+        value=f'{montecarlo[int(total_simulations/4)]:,}'
+    )
+    embed.add_field(
+        name="50th percentile",
+        value=f'{montecarlo[int(total_simulations/2)]:,}'
+    )
+    embed.add_field(
+        name="75th percentile",
+        value=f'{montecarlo[int(3*total_simulations/4)]:,}'
+    )
+    embed.add_field(
+        name="Total draws",
+        value=f'{sum(wins):,}'
+    )
+    embed.add_field(
+        name="Lifetime winnings",
+        value=f'{winnings:,}'
+    )
+    arrows = ''
+    green = get(emotes, name='omaewamou')
+    red = get(emotes, name='poop')
+    for p in [69.1, 84.1, 93.3, 97.7]:
+        if percentile >= p:
+            arrows += f'{green}'
+        elif 100 - percentile >= p:
+            arrows += f'{red}'
+    if not arrows:
+        arrows = f"{get(emotes, name='blobthinkingeyes')}"
+    embed.add_field(
+        name="Percentile",
+        value = f"{percentile:.0f} {arrows}"
+    )
+    await message.delete()
+    await ctx.send(content='', embed=embed)
 
-async def untouchable(ctx, args):
-    # Set up variables
-    with open('Apps/bank.json') as f:
-        bank_dict = load(f)
+
+# Edits bank.json
+async def untouchable(ctx, emotes, args):
+    # User check
     user = ctx.message.author
     userid = id(user)
-    # User checks
-    if not await user_exists(userid):
-        await new_user(ctx, bank_dict, userid)
+    await new_user(ctx, userid)
+    # Read data
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
     # Embed
     embed = Embed(
         title='UNTOUCHABLE!',
@@ -177,6 +231,10 @@ async def untouchable(ctx, args):
         if len(args) >= 2 and args[1] in bank_dict:
             userid = args[1]
         await history(ctx, embed, userid, bank_dict[userid])
+    elif args[0] in ['luck', 'l']:
+        if len(args) >= 2 and args[1] in bank_dict:
+            userid = args[1]
+        await percentile(ctx, embed, userid, bank_dict[userid], emotes)
     elif args[0] in ['leaderboards', 'leaders', 'lb']:
         num = -1
         if len(args) >= 2 and args[1].isnumeric():
@@ -199,4 +257,3 @@ async def untouchable(ctx, args):
         bank_dict[userid]['untouchable']['last_played'] = str(now)
         with open('Apps/bank.json', 'w') as f:
             dump(bank_dict, f)
-        

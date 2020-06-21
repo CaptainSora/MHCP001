@@ -1,14 +1,7 @@
 - File system
     - .env
-        - Test and verify @done
-        - Remove token.txt @done
         - Regenerate new token
         - Repeat for brawl stars API
-    - Client file
-        - Separate file for bot and client
-        - Separate module for puzzles
-        - Separate module for card collecting
-        - Separate module for adventure game tm
     - Bot
         - Change prefix
         - Yui onboarding
@@ -18,17 +11,12 @@
     - Bank
         - Change "new_user" to standalone not requiring bank_dict
         - MODULAR DESIGN DAMMIT
-        - Untouchable (lottery) @done
+        - Untouchable (lottery)
             - Change payout text?
         - Shop 
             - Might require cards to be set up
-        - Interest? (Daily) @done
-            - Tier @done
         - Stocks
-            - use randomgen, bounded in interval?
-            - maybe not true random, but trended?
-            - Fixed number buying/selling
-                - Refreshes per hour
+            - leaderboard
         - Gambling
             - Roulette
             - Slots
@@ -58,14 +46,21 @@
             - Beats = 2x, weakly beats = 1.5x
                 - Need to consider exact interactions
                 - I.e. defensive moves do damage only if successful?
-                - Consider: beats = 1.5/0, weakly beats = 1/0, neither = 1/1
+                - Consider: beats = 1.5/0, weakly beats = 1/0
+                    - neither = 1/1 or 0/0 depending on attacking/defending
             - Other ideas:
                 - Charge doubles(?) next move damage, attacks cancel it
                 - Heal restores hp, can be stopped by attacks and counter?
                     - Consumes item?
-                - 
+                - Generalized defensive item
+                    - Can be stopped by attacking moves
+                    - Successful otherwise
+                - Generalized offensive item
+                    - Can be stopped by defensive moves
+                    - Successful otherwise
+                    - Perhaps cancels offensive moves?
         - Character mechanic
-            - Has stats (atk, def, spd, str, int)
+            - Has stats (atk, def, spd, str, int, hp)
             - Stab/thrust boosted by Atk/Spd
             - Slash boosted by Atk/Str
             - Guard boosted by Def/Str
@@ -73,6 +68,21 @@
             - Parry boosted by Int/Spd
             - If runs out of HP, has a cooldown period before starting healing
                 - Otherwise starts healing immediately
+                - Alternatively, only heals if put into hospital
+                    - Cannot be taken out until fully healed?
+                    - 0 hp = automatic hospitalization?
+                    - Or heals v slowly outside of hospital
+                    - Hospital has limited spots, upgradable?
+        - City mechanic
+            - Buildings which give certain (permanent) buffs
+                - Hospital
+                - Barracks
+                - Wall St. (more traders)
+                - Bank (more interest, fixed per day)
+                - Investment firm (lower fees per trade)
+                - etc.
+            - Permanent buffs are dependent on how much you invest in the buildings
+                - Slight bonus for total investments?
     - Adventure game
 - Documentation
     - All of it please thanks

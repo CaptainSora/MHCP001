@@ -1,4 +1,4 @@
-from asyncio import sleep
+from asyncio import sleep, TimeoutError
 from json import load
 from os import getenv
 from random import choice
@@ -75,7 +75,7 @@ async def bank_wrapper(ctx, *args):
     help='Play the lottery and win Cor!'
 )
 async def untouchable_wrapper(ctx, *args):
-    await Apps.untouchable.untouchable(ctx, args)
+    await Apps.untouchable.untouchable(ctx, bot.emojis, args)
 
 @bot.command(
     name='stocks',
@@ -83,7 +83,7 @@ async def untouchable_wrapper(ctx, *args):
     help='Invest in the stock market!'
 )
 async def stocks_wrapper(ctx, *args):
-    await Apps.stocks.stocks(ctx, args)
+    await Apps.stocks.stocks(ctx, bot.emojis, args)
 
 @bot.command(name='logout', help='Admin command')
 @commands.is_owner()
@@ -95,7 +95,10 @@ async def logout(ctx):
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user or not dict_ready:
+    if not dict_ready:
+        return
+    if message.author == bot.user:
+        await confirm(message)
         return
     for k in emote_dict:
         if k in message.content.lower().split():
@@ -130,5 +133,47 @@ async def on_message(message):
                     emoji = get(bot.emojis, name=v)
                     await message.add_reaction(emoji)
     await bot.process_commands(message)  # NECESSARY TO NOT BREAK COMMANDS
+
+async def confirm(message):
+    if len(message.embeds) == 0:
+        return
+
+    def check(reaction, user):
+        return str(user) in message.embeds[0].description \
+            and str(reaction) == '✅'
+    
+    try:
+        reaction, user = await bot.wait_for(
+            'reaction_add',
+            timeout=15.0,
+            check=check
+        )
+        reaction = reaction  # Unused variable
+    except TimeoutError:
+        if message.embeds[0].title == 'Aincrad Stock Exchange' \
+                and "cancel in 15 seconds" in message.embeds[0].description:
+            # Edit message
+            embed=Embed(
+                title='Aincrad Stock Exchange',
+                description=f"Cancelled Transaction for {str(user)}",
+                colour=0x140088
+            )
+            await message.edit(embed=embed)
+    else:
+        if message.embeds[0].title == 'Aincrad Stock Exchange' \
+                and "cancel in 15 seconds" in message.embeds[0].description:
+            fields = message.embeds[0].fields
+            await Apps.stocks.sell_confirmed(message, fields, str(user))
+
+# @bot.event
+# async def on_raw_reaction_add(payload):
+#     user = bot.get_user(payload.user_id)
+#     if user == bot.user:
+#         return
+#     channel = bot.get_channel(payload.channel_id)
+#     message = await channel.fetch_message(payload.message_id)
+#     await channel.send(f"Reaction added by {user.mention}")
+#     # await channel.send(message.embeds[0].title)
+
 
 bot.run(TOKEN)
