@@ -19,6 +19,39 @@ from discord.utils import get
 from Apps.bank import id, new_user
 
 
+async def help(ctx):
+    helpstr = (
+        "```"
+        "Stock Market Help Page\n"
+        "\n"
+        "Command: .stocks    Alias: .s\n"
+        "\n"
+        "This is a list of arguments passed in the form\n"
+        "'.stocks (args) (addl args)'.\n"
+        "Additional arguments can be <mandatory> or [optional].\n"
+        "\n"
+        ".stocks ...         Alias  Details\n"
+        "{no argument}              Displays current stock prices\n"
+        "info                       Shows general stock market info\n"
+        "history             (h)    Displays historical stock data\n"
+        "holdings [userid]   (o)    Displays held stock\n"
+        "leaderboards        (lb)   Displays stock market leaderboards\n"
+        "buy <brief> <qty>   (b)    Buys stock\n"
+        "sell <brief> <qty>  (s)    Sells stock (has confirmation)\n"
+        "fees                (f)    Displays fee information\n"
+        "help                       Shows this page\n"
+        "\n"
+        "Additional argument info:\n"
+        "[userid]: The user whose holdings you want to see\n"
+        "            ex. 'CapSora#7528'\n"
+        "<brief> : The three-letter stock brief, not case-sensitive\n"
+        "            ex. 'AMS'\n"
+        "<qty>   : The quantity of stock you wish to trade\n"
+        "            ex. '3'\n"
+        "```"
+    )
+    await ctx.send(helpstr)
+
 def stock_home_value(stock_brief):
     """
     Generates the stock's home value from its 3-letter code.
@@ -91,22 +124,28 @@ def check_history():
     with open('Apps/stocks.json', 'w') as f:
         dump(stock_history, f)
 
+async def fees(ctx, embed):
+    embed.description = (
+        "Current fees are 100 Cor + 5% of the selling price."
+    )
+    await ctx.send(embed=embed)
+
 async def stock_help(ctx, embed):
     embed.description = "Trade Instructions"
     embed.add_field(
         name="Buying and selling",
         value=(
-            "Use .stocks <buy/sell> <brief> <qty> to buy stocks!\n"
+            "Use ```.stocks <buy/sell> <brief> <qty>``` to buy stocks!\n"
             "Stocks and traders refresh every hour."
         ),
-        inline=True
+        inline=False
     )
     embed.add_field(
         name="Notes",
         value=(
-            "1. Buyers and sellers are shared among all users\n"
-            "2. There is a fee for completed transactions (selling) so trade "
-            "wisely!"
+            "1. Buyers and sellers are shared among all users.\n"
+            "2. There is a 100 Cor + 5%%fee for completed transactions, "
+            "calculated on the sale of the shares."
         )
     )
     await ctx.send(embed=embed)
@@ -223,6 +262,8 @@ async def trade(ctx, embed, userid, args, buy=True):
             "avg_value": 0,
             "profit": 0
         }
+        with open('Apps/bank.json', 'w') as f:
+            dump(bank_dict, f)
     if bank_dict[userid]['stocks'][brief]['qty'] + qty < 0:
         await invalid_stocks(ctx, embed)
         return
@@ -264,7 +305,7 @@ async def trade(ctx, embed, userid, args, buy=True):
             value=f"{price} Cor"
         )
         # 100 Cor + 5% fees
-        fees = 100 + (value * 0.05)
+        fees = int(100 + (value * 0.05))
         embed.add_field(  # Field 2
             name=f"Transaction fees",
             value=f"{fees:,} Cor"
@@ -300,11 +341,11 @@ async def sell_confirmed(message, fields, userid):
     embed=Embed(
         title='Aincrad Stock Exchange',
         description=f"Transaction for {userid}",
-        colour=0x140088
+        colour=0x379cfa
     )
     embed.add_field(
-        name=f"Successful purchase of {name} ({brief})",
-        value=(f"{qty} shares"),
+        name=f"Successful sale of {name} ({brief})",
+        value=f"{abs(qty)} shares",
         inline=False
     )
     embed.add_field(
@@ -320,16 +361,6 @@ async def sell_confirmed(message, fields, userid):
         value=f"{value:,} Cor"
     )
     await message.channel.send(embed=embed)
-
-# async def test(ctx, embed):
-#     embed.description = f"Testing {ctx.message.author}"
-#     embed.add_field(name="This is a name", value="This is a value")
-#     msg = await ctx.send(embed=embed)
-#     await msg.add_reaction('✅')
-
-# async def test_success(msg, name='', value=''):
-#     print("Test success", msg)
-#     print(name, value)
 
 async def stock_prices(ctx, embed, emojis):
     # Load stock information
@@ -382,31 +413,48 @@ async def stock_price_history(ctx, embed, emojis):
     await ctx.send(embed=embed)
 
 async def view_holdings(ctx, embed, userid):
-    # User check
-    user = ctx.message.author
-    userid = id(user)
-    await new_user(ctx, userid)
     # Read data
     with open('Apps/bank.json') as f:
         bank_dict = load(f)
+    if userid not in bank_dict: # Should be unnecessary
+        return
     embed.description = f"Stock holdings for {userid}"
     if "stocks" in bank_dict[userid]:
         holdings = sorted([s for s in bank_dict[userid]['stocks']])
         for brief in holdings:
-            data = bank_dict[userid]['stocks']['brief']
+            data = bank_dict[userid]['stocks'][brief]
             embed.add_field(
                 name=f"{data['name']} ({brief})",
                 value=f"{data['qty']}"
             )
             embed.add_field(name="Avg. value", value=f"{data['avg_value']}")
-            embed.add_field(name='\u200b', value='\u200b')
+            embed.add_field(name="Total profits", value=f"{data['profit']}")
+    await ctx.send(embed=embed)
+
+async def leaderboards(ctx, embed):
+    lb = []
+    # Collect data
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
+    for user in bank_dict:
+        if 'stocks' in bank_dict[user]:
+            total_winnings = 0
+            for s in bank_dict[user]['stocks']:
+                total_winnings += bank_dict[user]['stocks'][s]['profit']
+            lb.append([user, total_winnings])
+    lb.sort(key=lambda x: x[1], reverse=True)
+    embed.description = 'Leaderboards for the stock market'
+    medals = ['🥇', '🥈', '🥉', '🎗️', '🎗️']
+    for i in range(min(len(lb), 5)):
+        embed.add_field(
+            name=f'{i+1}. {lb[i][0]}',
+            value=f'{medals[i]} {lb[i][1]} lifetime Cor',
+            inline=False
+        )
     await ctx.send(embed=embed)
 
 for s in sorted(['NVG', 'AUG', 'AMS', 'STL', 'MCB']):
     print(s, stock_home_value(s))
-
-if "-3".isdecimal():
-    print("-3 is a decimal")
 
 async def stocks(ctx, emojis, args):
     # User check
@@ -425,22 +473,30 @@ async def stocks(ctx, emojis, args):
             'Good credit? Bad credit? No credit? No problem!\n'
             "Oh you dead? F*** it, GHOST CREDIT!\nᴵ'ᵐ ᵍᵒⁿ ᵍᵉᵗ ᵃ ˢᵘᵇᵃʳᵘ"
         ),
-        colour=0x140088
+        colour=0x379cfa
     )
     # Logic
     if len(args) == 0:
         await stock_prices(ctx, embed, emojis)
     elif args[0] in ['help']:
+        await help(ctx)
+    elif args[0] in ['info']:
         await stock_help(ctx, embed)
     elif args[0] in ['history', 'h']:
         await stock_price_history(ctx, embed, emojis)
-    elif args[0] in ['holdings', 'owned']:
+    elif args[0] in ['holdings', 'o']:
         if len(args) >= 2 and args[1] in bank_dict:
             userid = args[1]
         await view_holdings(ctx, embed, userid)
-    # elif args[0] in ['test', 't']:
-    #     await test(ctx, embed)
+    elif args[0] in ['leaderboards', 'lb']:
+        await leaderboards(ctx, embed)
     elif args[0] in ['buy', 'b']:
         await trade(ctx, embed, userid, args, buy=True)
     elif args[0] in ['sell', 's']:
         await trade(ctx, embed, userid, args, buy=False)
+    elif args[0] in ['fees', 'f']:
+        await fees(ctx, embed)
+
+# Future functions
+
+

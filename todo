@@ -1,15 +1,20 @@
 - File system
+    - Race condition (move load/dump closer)
     - .env
         - Regenerate new token
         - Repeat for brawl stars API
+        - Include module colors???
     - Bot
         - Change prefix
         - Yui onboarding
             - Create channel section for yui-related
             - Separate channels for diff activities
             - Onboarding channel in general text
+    - Badges
+        - First for matches
+        - First numerical win
+        - Tiers for interest (by percentage?)
     - Bank
-        - Change "new_user" to standalone not requiring bank_dict
         - MODULAR DESIGN DAMMIT
         - Untouchable (lottery)
             - Change payout text?
@@ -74,12 +79,24 @@
                     - Or heals v slowly outside of hospital
                     - Hospital has limited spots, upgradable?
         - City mechanic
+            - Upgrades requires both Cor and certain materials???
             - Buildings which give certain (permanent) buffs
                 - Hospital
                 - Barracks
-                - Wall St. (more traders)
-                - Bank (more interest, fixed per day)
-                - Investment firm (lower fees per trade)
+                - Wall St.
+                    - Unlocks more traders (by changing lambda)
+                    - Shows net profit on selling stock
+                    - Guarantees a fixed number of traders (w/o changing lambda)
+                - Bank
+                    - more interest, fixed per day
+                - Investment firm
+                    - Lower fees per trade, both fixed and variable
+                - Research lab
+                    - Works by putting funds towards research
+                    - Unlocks features
+                        - Shows net profit on selling stock
+                        - Allows for "a" command to buy/sell all possible
+                        - Saves a preset for the lottery
                 - etc.
             - Permanent buffs are dependent on how much you invest in the buildings
                 - Slight bonus for total investments?

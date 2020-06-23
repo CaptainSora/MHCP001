@@ -4,11 +4,39 @@ from math import ceil
 
 from discord import Embed
 
+async def help(ctx):
+    helpstr = (
+        "```"
+        "Bank Help Page\n"
+        "\n"
+        "Command: .bank    Alias: .b\n"
+        "\n"
+        "This is a list of arguments passed in the form\n"
+        "'.stocks (args)'.\n"
+        "\n"
+        ".bank ...      Alias  Details\n"
+        "{no argument}         Displays your current bank balance\n"
+        "interest       (i)    Claims your daily interest\n"
+        "leaderboards   (lb)   Displays bank balance leaderboards\n"
+        "help                  Shows this page\n"
+        "```"
+    )
+    await ctx.send(helpstr)
+
 def id(user):
     return '#'.join([str(user.name), str(user.discriminator)])
 
 async def utc_time(ctx):
     await ctx.send(datetime.now(timezone.utc).strftime('%H:%M:%S') + ' UTC')
+
+async def secret_command_bitch(ctx):
+    url = (
+        "https://ih1.redbubble.net/image.1207597832.3765/st,small,507x507-pad,"
+        "600x600,f8f8f8.jpg"
+    )
+    embed = Embed()
+    embed.set_image(url=url)
+    await ctx.send(embed=embed)
 
 async def bank(ctx, args):
     """
@@ -16,19 +44,27 @@ async def bank(ctx, args):
     """
     user = ctx.message.author
     userid = id(user)
+    # Embed
+    embed = Embed(
+        title='Bank of Aincrad',
+        description="Store your money here!",
+        colour=0xffb833
+    )
     await new_user(ctx, userid)  # Initialize user, if not exists
     if len(args) == 0:
         # Display balance
-        await balance(ctx, userid)
-    elif args[0] in ['help', 'h']:
-        await bankhelp()
-    elif args[0] in ['claim', 'interest', 'c', 'i']:
-        await interest(ctx, userid)
+        await balance(ctx, embed, userid)
+    elif args[0] in ['help']:
+        await help(ctx)
+    elif args[0] in ['interest', 'i']:
+        if args == ('i', 't', 'c', 'h'):
+            await secret_command_bitch(ctx)
+        else:
+            await interest(ctx, embed, userid)
+    elif args[0] in ['leaderboards', 'lb']:
+        await leaderboards(ctx, embed)
     else:
         print("bank.py, bank(): Invalid arguments")
-
-async def bankhelp():
-    pass
 
 async def new_user(ctx, userid):
     """
@@ -47,9 +83,9 @@ async def new_user(ctx, userid):
             "Hello and welcome to the Bank of Aincrad!\n"
             "As this is your first time here, please take this welcome "
             "bonus of 100 Cor!\n"
-            "Please feel free to use `.bankhelp` to see what services we "
+            "Please feel free to use `.bank help` to see what services we "
             "offer, and don't forget to claim your interest daily with "
-            "`.bank claim`!"
+            "`.bank interest`!"
         ),
         colour=0xffff33
     )
@@ -70,7 +106,7 @@ async def new_user(ctx, userid):
         dump(bank_dict, f)
     return True
 
-async def balance(ctx, userid):
+async def balance(ctx, embed, userid):
     """
     Prints the balance for the user, and checks if their interest is claimable.
     Requires: userid in bank_dict
@@ -79,19 +115,36 @@ async def balance(ctx, userid):
         bank_dict = load(f)
     if userid not in bank_dict:
         return False
-    embed = Embed(
-        title='Bank of Aincrad',
-        description=f'Balance for {userid}',
-        colour=0xffff33
-    )
+    embed.description = f'Balance for {userid}'
     embed.add_field(name='Balance', value=f'{bank_dict[userid]["cor"]} Cor')
     cur_date = str(datetime.now(timezone.utc).date())
     if cur_date != bank_dict[userid]['interest']['last_collected']:
         embed.add_field(name='Interest', value='Claimable!')
     await ctx.send(embed=embed)
 
+async def leaderboards(ctx, embed):
+    lb = []
+    # Collect data
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
+    for user in bank_dict:
+        lb.append([
+            user,
+            bank_dict[user]['cor']
+        ])
+    lb.sort(key=lambda x: x[1], reverse=True)
+    embed.description = 'Leaderboards for bank balance'
+    medals = ['🥇', '🥈', '🥉', '🎗️', '🎗️']
+    for i in range(min(len(lb), 5)):
+        embed.add_field(
+            name=f'{i+1}. {lb[i][0]}',
+            value=f'{medals[i]} {lb[i][1]} Cor',
+            inline=False
+        )
+    await ctx.send(embed=embed)
+
 # Edits bank.json
-async def interest(ctx, userid):
+async def interest(ctx, embed, userid):
     """
     Earns daily interest.
     """
@@ -101,11 +154,7 @@ async def interest(ctx, userid):
     if userid not in bank_dict:
         return False
     # Embed
-    embed = Embed(
-        title='Bank of Aincrad',
-        description=f'Daily Interest for {userid}',
-        colour=0xffff33
-    )
+    embed.description = f'Daily Interest for {userid}'
     # Calculation
     cur_date = str(datetime.now(timezone.utc).date())
     balance = max(1, bank_dict[userid]['cor'])

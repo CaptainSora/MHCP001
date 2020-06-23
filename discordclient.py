@@ -9,6 +9,7 @@ from discord.utils import get
 from dotenv import load_dotenv
 
 import Apps.bank
+import Apps.roulette
 import Apps.stocks
 import Apps.untouchable
 
@@ -16,6 +17,7 @@ load_dotenv()
 TOKEN = getenv('API_ACCESS')
 
 bot = commands.Bot(command_prefix='.')
+bot.remove_command('help')
 
 dict_ready = False
 
@@ -41,19 +43,69 @@ async def on_ready():
     dict_ready = True
 
 
+@bot.command(name='help', aliases=['h'])
+async def help(ctx):
+    helpstr = (
+        "```"
+        "General Help Page\n"
+        "\n"
+        "This is a list of all of the public commands.\n"
+        "Commands with a (+) have their own help page; access them with "
+        "'.cmd help'\n"
+        "\n"
+        "    Command       Alias  Summary\n"
+        "(+) .bank         (b)    Currency and interest\n"
+        "(+) .untouchable  (u)    Free lottery\n"
+        "(+) .stocks       (s)    Stock market\n"
+        "(+) .roulette     (r)    Roulette (casino game)\n"
+        "    .time         (utc)  Displays current UTC time\n"
+        "    .emote               Displays a random emote\n"
+        "    .emotes              Displays all emote triggers (1)\n"
+        "    .gifs                Displays all gif triggers (2)\n"
+        "    .reacts              Displays all reaction triggers (1)\n"
+        "    .poke                Pokes Yui\n"
+        "    .taco                Gives Yui a taco\n"
+        "    .status              Check if Yui is online\n"
+        "    .help         (h)    Shows this page\n"
+        "\n"
+        "(1) Emotes/reactions are triggered if any message contains the\n"
+        "    trigger text as a word (not case-sensitive).\n"
+        "(2) Gifs/Images are triggered if the message is exactly the\n"
+        "    trigger text (not case-sensitive)."
+        "```"
+    )
+    await ctx.send(helpstr)
+
 @bot.command(name='poke')
 async def poke(ctx):
-    await ctx.send("No poking. For real this time.")
+    phrases = [
+        "Hey! No fair!",
+        "No more poking. Hmpf.",
+        "What's up?",
+        "You called?",
+        "\\*yawns\\*"
+    ]
+    await ctx.send(choice(phrases))
 
-@bot.command(name='emote', help='Displays a random emote')
+@bot.command(name='taco')
+async def taco(ctx):
+    phrases = [
+        "Om nom nom...",
+        "Mmm, tacos...",
+        "Spicy!!",
+        "Ish sho good!"
+    ]
+    await ctx.send(choice(phrases))
+
+@bot.command(name='emote')
 async def emote(ctx):
     await ctx.send(choice(bot.emojis))
 
-@bot.command(name='emotes', help='Displays a list of all emotes')
+@bot.command(name='emotes')
 async def emotes(ctx):
     await ctx.send('\n'.join(sorted(list(emote_dict.keys()))))
 
-@bot.command(name='gifs', help='Displays a list of all gifs')
+@bot.command(name='gifs')
 async def gifs(ctx):
     entries = sorted([str(x) for x in gif_dict.keys()])
     for i in range(len(entries)):
@@ -61,29 +113,36 @@ async def gifs(ctx):
             entries[i] += f' ({len(gif_dict[entries[i]])})'
     await ctx.send('\n'.join(entries))
 
-@bot.command(name='time', aliases=['now', 't', 'utc'])
+@bot.command(name='reacts')
+async def reacts(ctx):
+    await ctx.send('\n'.join(sorted(list(react_dict.keys()))))
+
+@bot.command(name='time', aliases=['utc'])
 async def utc_time_wrapper(ctx, *args):
     await Apps.bank.utc_time(ctx)
 
-@bot.command(name='bank', aliases=['b'], help='bank game')
+@bot.command(name='bank', aliases=['b'])
 async def bank_wrapper(ctx, *args):
     await Apps.bank.bank(ctx, args)
 
-@bot.command(
-    name='untouchable',
-    aliases=['lottery', 'lotto', 'u', 'l'],
-    help='Play the lottery and win Cor!'
-)
+@bot.command(name='untouchable', aliases=['u'])
 async def untouchable_wrapper(ctx, *args):
     await Apps.untouchable.untouchable(ctx, bot.emojis, args)
 
-@bot.command(
-    name='stocks',
-    aliases=['stock', 's'],
-    help='Invest in the stock market!'
-)
+@bot.command(name='stocks', aliases=['s'])
 async def stocks_wrapper(ctx, *args):
     await Apps.stocks.stocks(ctx, bot.emojis, args)
+
+@bot.command(name='roulette', aliases=['r'])
+async def roulette_wrapper(ctx, *args):
+    await Apps.roulette.roulette(ctx, args)
+
+@bot.command(name='status')
+async def status(ctx):
+    await ctx.send(
+        f"{bot.user.name} is here to fix bugs and cause chaos. And she's all "
+        f"out of bugs."
+    )
 
 @bot.command(name='logout', help='Admin command')
 @commands.is_owner()
@@ -99,6 +158,9 @@ async def on_message(message):
         return
     if message.author == bot.user:
         await confirm(message)
+        return
+    if message.content.startswith('.'):
+        await bot.process_commands(message)  # NECESSARY TO NOT BREAK COMMANDS
         return
     for k in emote_dict:
         if k in message.content.lower().split():
@@ -132,10 +194,13 @@ async def on_message(message):
                 elif k == 'name':
                     emoji = get(bot.emojis, name=v)
                     await message.add_reaction(emoji)
-    await bot.process_commands(message)  # NECESSARY TO NOT BREAK COMMANDS
 
 async def confirm(message):
     if len(message.embeds) == 0:
+        return
+    if not message.embeds[0].description:
+        return
+    if "cancel in 15 seconds" not in message.embeds[0].description:
         return
 
     def check(reaction, user):
@@ -150,18 +215,18 @@ async def confirm(message):
         )
         reaction = reaction  # Unused variable
     except TimeoutError:
-        if message.embeds[0].title == 'Aincrad Stock Exchange' \
-                and "cancel in 15 seconds" in message.embeds[0].description:
-            # Edit message
+        if message.embeds[0].title == 'Aincrad Stock Exchange':
+            userid = message.embeds[0].description.split()[2]
+            # New message
             embed=Embed(
                 title='Aincrad Stock Exchange',
-                description=f"Cancelled Transaction for {str(user)}",
-                colour=0x140088
+                description=f"Cancelled Transaction for {userid}",
+                colour=0x379cfa
             )
-            await message.edit(embed=embed)
+            await message.delete()
+            await message.channel.send(embed=embed)
     else:
-        if message.embeds[0].title == 'Aincrad Stock Exchange' \
-                and "cancel in 15 seconds" in message.embeds[0].description:
+        if message.embeds[0].title == 'Aincrad Stock Exchange':
             fields = message.embeds[0].fields
             await Apps.stocks.sell_confirmed(message, fields, str(user))
 

@@ -21,6 +21,38 @@ PAYOUTS = {
     6: 10000000
 }
 
+async def help(ctx):
+    helpstr = (
+        "```"
+        "Lottery Help Page\n"
+        "\n"
+        "Command: .untouchable    Alias: .u\n"
+        "\n"
+        "This is a list of arguments passed in the form\n"
+        "'.stocks (args) (addl args)'.\n"
+        "Additional arguments can be <mandatory> or [optional].\n"
+        "\n"
+        ".untouchable ...    Alias   Details\n"
+        "{no argument}               Displays lottery instructions\n"
+        "rates                       Displays lottery odds\n"
+        "history [userid]    (h)     Displays your lottery history\n"
+        "luck [userid]       (l)     Calculates your luck\n"
+        "leaderboards [num]  (lb)    Displays lottery leaderboards\n"
+        "<guess>                     Plays the lottery\n"
+        "random              (r)     Plays the lottery with a random number\n"
+        "help                        Shows this page\n"
+        "\n"
+        "Additional argument info:\n"
+        "[userid]: The user whose information you want to see\n"
+        "            ex. 'CapSora#7528'\n"
+        "[num]   : The specific outcome you want to see leaderboards for\n"
+        "            ex. '3'\n"
+        "<guess> : A six-digit (0-9) guess to play the lottery\n"
+        "            ex. '012345'\n"
+        "```"
+    )
+    await ctx.send(helpstr)
+
 def binom(n, p, k):
     return comb(n, k) * pow(p, k) * pow((1-p), (n-k))
 
@@ -57,12 +89,12 @@ async def cooldown(ctx, embed, cooldown, time_since_last_play):
         name='Please wait...',
         value=(
             f'Play again in '
-            f'{cooldown.seconds- time_since_last_play.seconds}s'
+            f'{cooldown.seconds- time_since_last_play.seconds}s ⏱️'
         )
     )
     await ctx.send(embed=embed)
 
-async def lottery(ctx, embed, guess):
+async def lottery(ctx, embed, emotes, guess):
     embed.add_field(
         name=f"{ctx.message.author}'s Guess",
         value=str(guess),
@@ -70,10 +102,24 @@ async def lottery(ctx, embed, guess):
     )
     lotto = f'{randrange(1000000):06}'
     matches = sum(a == b for a, b in zip(str(guess), lotto))
+    payout = f'Payout: {PAYOUTS[matches]} Cor'
+    if matches == 0:
+        emoji = get(emotes, name='icrierryday')
+        payout += f"... {emoji}"
+    elif matches == 1:
+        emoji = get(emotes, name='geh')
+        payout += f" {emoji}"
+    elif matches == 2:
+        emoji = get(emotes, name='dabby')
+        payout += f"! {emoji}"
+    elif matches >= 3:
+        embed.colour = 0xffff00
+        emoji = get(emotes, name='✨')
+        payout += f'!!! {emoji}{emoji}{emoji}'
     embed.add_field(name='Winning Number', value=lotto, inline=False)
     embed.add_field(
         name=f'Matches: {matches}',
-        value=f'Payout: {PAYOUTS[matches]} Cor!'
+        value=payout
     )
     await ctx.send(embed=embed)
     return matches
@@ -130,12 +176,13 @@ async def leaderboards(ctx, embed, bank_dict, num=-1):
             embed.description = 'Leaderboards for overall earnings'
         else:
             embed.description = f'Leaderboards for {num} {matches}'
+        medals = ['🥇', '🥈', '🥉', '🎗️', '🎗️']
         for i in range(min(len(lb), 5)):
             title = f'{i+1}. {lb[i][0]}'
             if num == -1:
-                text = f'{lb[i][1]} lifetime Cor'
+                text = f'{medals[i]} {lb[i][1]} lifetime Cor'
             else:
-                text = f'{lb[i][1]} draws with {num} {matches}'
+                text = f'{medals[i]} {lb[i][1]} draws with {num} {matches}'
             text += f' ({lb[i][2]} total draws)'
             embed.add_field(name=title, value=text, inline=False)
         await ctx.send(embed=embed)
@@ -146,13 +193,12 @@ async def percentile(ctx, embed, userid, userdata, emotes):
     winnings = sum(wins[k] * PAYOUTS[k] for k in range(7))
     total_simulations = 10000
     montecarlo = []
+    countnum = f'{randrange(10)}'
     for _ in range(total_simulations):
         total = 0
         for _ in range(sum(wins)):
             guess = f'{randrange(1000000):06}'
-            lotto = f'{randrange(1000000):06}'
-            matches = sum(a == b for a, b in zip(str(guess), lotto))
-            total += PAYOUTS[matches]
+            total += PAYOUTS[guess.count(countnum)]
         montecarlo.append(total)
     percentile = (
         len([x for x in montecarlo if x <= winnings]) / total_simulations * 100
@@ -225,9 +271,11 @@ async def untouchable(ctx, emotes, args):
     # Logic
     if len(args) == 0:
         await instructions(ctx, embed)
-    elif args[0] in ['rates', 'payout', 'payouts']:
+    elif args[0] in ['help']:
+        await help(ctx)
+    elif args[0] in ['rates']:
         await rates(ctx, embed)
-    elif args[0] in ['history', 'hist', 'h']:
+    elif args[0] in ['history', 'h']:
         if len(args) >= 2 and args[1] in bank_dict:
             userid = args[1]
         await history(ctx, embed, userid, bank_dict[userid])
@@ -235,7 +283,7 @@ async def untouchable(ctx, emotes, args):
         if len(args) >= 2 and args[1] in bank_dict:
             userid = args[1]
         await percentile(ctx, embed, userid, bank_dict[userid], emotes)
-    elif args[0] in ['leaderboards', 'leaders', 'lb']:
+    elif args[0] in ['leaderboards', 'lb']:
         num = -1
         if len(args) >= 2 and args[1].isnumeric():
             num = int(args[1])
@@ -243,14 +291,14 @@ async def untouchable(ctx, emotes, args):
     elif now - last_play < cooldown_dur:
         await cooldown(ctx, embed, cooldown_dur, now - last_play)
     else:
-        if args[0] in ['random', 'rand', 'r']:
+        if args[0] in ['random', 'r']:
             guess = f'{randrange(1000000):06}'
         elif len(args[0]) == 6 and str(args[0]).isnumeric():
             guess = str(args[0])
         else:
-            await ctx.send('Command not found.')
+            await ctx.send('Please guess a 6-digit (0-9) number.')
             return
-        matches = await lottery(ctx, embed, guess)
+        matches = await lottery(ctx, embed, emotes, guess)
         # Add value to bank dict
         bank_dict[userid]['cor'] += PAYOUTS[matches]
         bank_dict[userid]['untouchable']['wins'][matches] += 1
