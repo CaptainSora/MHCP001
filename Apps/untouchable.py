@@ -9,6 +9,7 @@ from discord import Embed
 from discord.utils import get
 
 from Apps.bank import id, new_user
+from Help.help import help_page
 
 # E(X) = 207 Cor
 PAYOUTS = {
@@ -20,38 +21,6 @@ PAYOUTS = {
     5: 301500,
     6: 10000000
 }
-
-async def help(ctx):
-    helpstr = (
-        "```"
-        "Lottery Help Page\n"
-        "\n"
-        "Command: .untouchable    Alias: .u\n"
-        "\n"
-        "This is a list of arguments passed in the form\n"
-        "'.stocks (args) (addl args)'.\n"
-        "Additional arguments can be <mandatory> or [optional].\n"
-        "\n"
-        ".untouchable ...    Alias   Details\n"
-        "{no argument}               Displays lottery instructions\n"
-        "rates                       Displays lottery odds\n"
-        "history [userid]    (h)     Displays your lottery history\n"
-        "luck [userid]       (l)     Calculates your luck\n"
-        "leaderboards [num]  (lb)    Displays lottery leaderboards\n"
-        "<guess>                     Plays the lottery\n"
-        "random              (r)     Plays the lottery with a random number\n"
-        "help                        Shows this page\n"
-        "\n"
-        "Additional argument info:\n"
-        "[userid]: The user whose information you want to see\n"
-        "            ex. 'CapSora#7528'\n"
-        "[num]   : The specific outcome you want to see leaderboards for\n"
-        "            ex. '3'\n"
-        "<guess> : A six-digit (0-9) guess to play the lottery\n"
-        "            ex. '012345'\n"
-        "```"
-    )
-    await ctx.send(helpstr)
 
 def binom(n, p, k):
     return comb(n, k) * pow(p, k) * pow((1-p), (n-k))
@@ -272,7 +241,7 @@ async def untouchable(ctx, emotes, args):
     if len(args) == 0:
         await instructions(ctx, embed)
     elif args[0] in ['help']:
-        await help(ctx)
+        await help_page(ctx, "untouchable")
     elif args[0] in ['rates']:
         await rates(ctx, embed)
     elif args[0] in ['history', 'h']:

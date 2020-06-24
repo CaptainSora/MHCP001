@@ -12,6 +12,7 @@ import Apps.bank
 import Apps.roulette
 import Apps.stocks
 import Apps.untouchable
+from Help.help import help_page
 
 load_dotenv()
 TOKEN = getenv('API_ACCESS')
@@ -45,36 +46,7 @@ async def on_ready():
 
 @bot.command(name='help', aliases=['h'])
 async def help(ctx):
-    helpstr = (
-        "```"
-        "General Help Page\n"
-        "\n"
-        "This is a list of all of the public commands.\n"
-        "Commands with a (+) have their own help page; access them with "
-        "'.cmd help'\n"
-        "\n"
-        "    Command       Alias  Summary\n"
-        "(+) .bank         (b)    Currency and interest\n"
-        "(+) .untouchable  (u)    Free lottery\n"
-        "(+) .stocks       (s)    Stock market\n"
-        "(+) .roulette     (r)    Roulette (casino game)\n"
-        "    .time         (utc)  Displays current UTC time\n"
-        "    .emote               Displays a random emote\n"
-        "    .emotes              Displays all emote triggers (1)\n"
-        "    .gifs                Displays all gif triggers (2)\n"
-        "    .reacts              Displays all reaction triggers (1)\n"
-        "    .poke                Pokes Yui\n"
-        "    .taco                Gives Yui a taco\n"
-        "    .status              Check if Yui is online\n"
-        "    .help         (h)    Shows this page\n"
-        "\n"
-        "(1) Emotes/reactions are triggered if any message contains the\n"
-        "    trigger text as a word (not case-sensitive).\n"
-        "(2) Gifs/Images are triggered if the message is exactly the\n"
-        "    trigger text (not case-sensitive)."
-        "```"
-    )
-    await ctx.send(helpstr)
+    await help_page(ctx, "bot")
 
 @bot.command(name='poke')
 async def poke(ctx):
@@ -229,16 +201,6 @@ async def confirm(message):
         if message.embeds[0].title == 'Aincrad Stock Exchange':
             fields = message.embeds[0].fields
             await Apps.stocks.sell_confirmed(message, fields, str(user))
-
-# @bot.event
-# async def on_raw_reaction_add(payload):
-#     user = bot.get_user(payload.user_id)
-#     if user == bot.user:
-#         return
-#     channel = bot.get_channel(payload.channel_id)
-#     message = await channel.fetch_message(payload.message_id)
-#     await channel.send(f"Reaction added by {user.mention}")
-#     # await channel.send(message.embeds[0].title)
 
 
 bot.run(TOKEN)

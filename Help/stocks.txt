@@ -1,0 +1,28 @@
+```
+Stock Market Help Page
+
+Command: .stocks    Alias: .s
+
+This is a list of arguments passed in the form
+'.stocks (args) (addl args)'.
+Additional arguments can be <mandatory> or [optional].
+
+.stocks ...         Alias  Details
+{no argument}              Displays current stock prices
+info                       Shows general stock market info
+history             (h)    Displays historical stock data
+holdings [userid]   (o)    Displays held stock
+leaderboards        (lb)   Displays stock market leaderboards
+buy <brief> <qty>   (b)    Buys stock
+sell <brief> <qty>  (s)    Sells stock (has confirmation)
+fees                (f)    Displays fee information
+help                       Shows this page
+
+Additional argument info:
+[userid]: The user whose holdings you want to see
+            ex. 'CapSora#7528'
+<brief> : The three-letter stock brief, not case-sensitive
+            ex. 'AMS'
+<qty>   : The quantity of stock you wish to trade
+            ex. '3'
+```

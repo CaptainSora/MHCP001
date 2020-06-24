@@ -4,24 +4,8 @@ from math import ceil
 
 from discord import Embed
 
-async def help(ctx):
-    helpstr = (
-        "```"
-        "Bank Help Page\n"
-        "\n"
-        "Command: .bank    Alias: .b\n"
-        "\n"
-        "This is a list of arguments passed in the form\n"
-        "'.stocks (args)'.\n"
-        "\n"
-        ".bank ...      Alias  Details\n"
-        "{no argument}         Displays your current bank balance\n"
-        "interest       (i)    Claims your daily interest\n"
-        "leaderboards   (lb)   Displays bank balance leaderboards\n"
-        "help                  Shows this page\n"
-        "```"
-    )
-    await ctx.send(helpstr)
+from Help.help import help_page
+
 
 def id(user):
     return '#'.join([str(user.name), str(user.discriminator)])
@@ -55,7 +39,7 @@ async def bank(ctx, args):
         # Display balance
         await balance(ctx, embed, userid)
     elif args[0] in ['help']:
-        await help(ctx)
+        await help_page(ctx, "bank")
     elif args[0] in ['interest', 'i']:
         if args == ('i', 't', 'c', 'h'):
             await secret_command_bitch(ctx)

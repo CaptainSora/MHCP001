@@ -1,0 +1,28 @@
+```
+General Help Page
+
+This is a list of all of the public commands.
+Commands with a (+) have their own help page; access them with 
+'.cmd help'
+
+    Command       Alias  Summary
+(+) .profile      (p)    Information about the player
+(+) .bank         (b)    Currency and interest
+(+) .untouchable  (u)    Free lottery
+(+) .stocks       (s)    Stock market
+(+) .roulette     (r)    Roulette (casino game)
+    .time         (utc)  Displays current UTC time
+    .emote               Displays a random emote
+    .emotes              Displays all emote triggers (1)
+    .gifs                Displays all gif triggers (2)
+    .reacts              Displays all reaction triggers (1)
+    .poke                Pokes Yui
+    .taco                Gives Yui a taco
+    .status              Check if Yui is online
+    .help         (h)    Shows this page
+
+(1) Emotes/reactions are triggered if any message contains the
+    trigger text as a word (not case-sensitive).
+(2) Gifs/Images are triggered if the message is exactly the
+    trigger text (not case-sensitive).
+```

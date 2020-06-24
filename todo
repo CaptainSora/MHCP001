@@ -97,6 +97,9 @@
                         - Shows net profit on selling stock
                         - Allows for "a" command to buy/sell all possible
                         - Saves a preset for the lottery
+                        - Notifies you if stock price above certain ratio
+                            - Also if you have certain amount
+                            - Also if sellers over certain number
                 - etc.
             - Permanent buffs are dependent on how much you invest in the buildings
                 - Slight bonus for total investments?

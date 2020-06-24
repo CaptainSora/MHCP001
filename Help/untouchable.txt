@@ -1,0 +1,27 @@
+```
+Lottery Help Page
+
+Command: .untouchable    Alias: .u
+
+This is a list of arguments passed in the form
+'.stocks (args) (addl args)'.
+Additional arguments can be <mandatory> or [optional].
+
+.untouchable ...    Alias   Details
+{no argument}               Displays lottery instructions
+rates                       Displays lottery odds
+history [userid]    (h)     Displays your lottery history
+luck [userid]       (l)     Calculates your luck
+leaderboards [num]  (lb)    Displays lottery leaderboards
+<guess>                     Plays the lottery
+random              (r)     Plays the lottery with a random number
+help                        Shows this page
+
+Additional argument info:
+[userid]: The user whose information you want to see
+            ex. 'CapSora#7528'
+[num]   : The specific outcome you want to see leaderboards for
+            ex. '3'
+<guess> : A six-digit (0-9) guess to play the lottery
+            ex. '012345'
+```

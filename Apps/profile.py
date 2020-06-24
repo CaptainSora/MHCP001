@@ -5,11 +5,14 @@ BADGE_ICONS = {
     "other": "🏅🎗️🎯🎲💎🔰🧮📈🎉🧬👑🌸⚡☄️🔥💥🎰💰🛡️🪓⚔️🗡️🎁"
 }
 
-async def help(ctx):
-    pass
-
 async def badges(ctx, args):
     pass
 
 async def add_badge(ctx, args):
+    """
+    Safe to call anytime
+    """
+    pass
+
+async def profile(ctx, args):
     pass

@@ -17,40 +17,8 @@ from discord import Embed
 from discord.utils import get
 
 from Apps.bank import id, new_user
+from Help.help import help_page
 
-
-async def help(ctx):
-    helpstr = (
-        "```"
-        "Stock Market Help Page\n"
-        "\n"
-        "Command: .stocks    Alias: .s\n"
-        "\n"
-        "This is a list of arguments passed in the form\n"
-        "'.stocks (args) (addl args)'.\n"
-        "Additional arguments can be <mandatory> or [optional].\n"
-        "\n"
-        ".stocks ...         Alias  Details\n"
-        "{no argument}              Displays current stock prices\n"
-        "info                       Shows general stock market info\n"
-        "history             (h)    Displays historical stock data\n"
-        "holdings [userid]   (o)    Displays held stock\n"
-        "leaderboards        (lb)   Displays stock market leaderboards\n"
-        "buy <brief> <qty>   (b)    Buys stock\n"
-        "sell <brief> <qty>  (s)    Sells stock (has confirmation)\n"
-        "fees                (f)    Displays fee information\n"
-        "help                       Shows this page\n"
-        "\n"
-        "Additional argument info:\n"
-        "[userid]: The user whose holdings you want to see\n"
-        "            ex. 'CapSora#7528'\n"
-        "<brief> : The three-letter stock brief, not case-sensitive\n"
-        "            ex. 'AMS'\n"
-        "<qty>   : The quantity of stock you wish to trade\n"
-        "            ex. '3'\n"
-        "```"
-    )
-    await ctx.send(helpstr)
 
 def stock_home_value(stock_brief):
     """
@@ -479,7 +447,7 @@ async def stocks(ctx, emojis, args):
     if len(args) == 0:
         await stock_prices(ctx, embed, emojis)
     elif args[0] in ['help']:
-        await help(ctx)
+        await help_page(ctx, "stocks")
     elif args[0] in ['info']:
         await stock_help(ctx, embed)
     elif args[0] in ['history', 'h']:

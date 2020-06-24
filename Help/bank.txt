@@ -1,0 +1,14 @@
+```
+Bank Help Page
+
+Command: .bank    Alias: .b
+
+This is a list of arguments passed in the form
+'.stocks (args)'.
+
+.bank ...      Alias  Details
+{no argument}         Displays your current bank balance
+interest       (i)    Claims your daily interest
+leaderboards   (lb)   Displays bank balance leaderboards
+help                  Shows this page
+```

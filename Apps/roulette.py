@@ -6,6 +6,8 @@ from Apps.bank import id, new_user
 from discord import Embed
 from json import load, dump
 
+from Help.help import help_page
+
 # Roulette
 TRANSLATE = {
     'o': "Odd",
@@ -21,37 +23,6 @@ TRANSLATE = {
     'c2': "Second column",
     'c3': 'Third column'
 }
-
-async def help(ctx):
-    helpstr = (
-        "```"
-        "Roulette Help Page\n"
-        "\n"
-        "Command: .roulette    Alias: .r\n"
-        "\n"
-        "This is a list of arguments passed in the form\n"
-        "'.stocks (args) (addl args)'.\n"
-        "Additional arguments can be <mandatory> or [optional].\n"
-        "\n"
-        ".untouchable ...    Alias   Details\n"
-        "{no argument}               Displays roulette instructions\n"
-        "table               (t)     Displays the roulette table\n"
-        "rates                       Displays roulette payouts\n"
-        "history [userid]    (h)     Displays your roulette history\n"
-        "leaderboards        (lb)    Displays roulette leaderboards\n"
-        "<guess> <bet>               Plays the lottery\n"
-        "help                        Shows this page\n"
-        "\n"
-        "Additional argument info:\n"
-        "[userid]: The user whose information you want to see\n"
-        "            ex. 'CapSora#7528'\n"
-        "<guess> : The numbers you would like to bet on.\n"
-        "            ex. 'b' (Use .roulette to get full list)\n"
-        "<bet>   : The amount you would like to bet, no more than 1000\n"
-        "            ex. '100'\n"
-        "```"
-    )
-    await ctx.send(helpstr)
 
 def is_win(betstr, num):
     if betstr == 'l':
@@ -220,7 +191,7 @@ async def roulette(ctx, args):
     if len(args) == 0:
         await instructions(ctx, embed)
     elif args[0] in ['help']:
-        await help(ctx)
+        await help_page(ctx, "roulette")
     elif args[0] in ['rates']:
         await rates(ctx, embed)
     elif args[0] in ['table', 't']:
