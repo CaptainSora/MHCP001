@@ -12,6 +12,7 @@ import Apps.bank
 import Apps.roulette
 import Apps.stocks
 import Apps.untouchable
+import Apps.profile
 from Help.help import help_page
 
 load_dotenv()
@@ -109,6 +110,14 @@ async def stocks_wrapper(ctx, *args):
 async def roulette_wrapper(ctx, *args):
     await Apps.roulette.roulette(ctx, args)
 
+@bot.command(name='profile', aliases=['p'])
+async def profile_wrapper(ctx, *args):
+    await Apps.profile.profile(ctx, args)
+
+@bot.command(name='badges')
+async def badge_wrapper(ctx, *args):
+    await Apps.profile.all_badges(ctx, args)
+
 @bot.command(name='status')
 async def status(ctx):
     await ctx.send(
@@ -120,7 +129,7 @@ async def status(ctx):
 @commands.is_owner()
 async def logout(ctx):
     await bot.change_presence(activity=None, status=Status('offline'))
-    print("Goodnight!")
+    await ctx.send("Logging off. Goodnight!")
     await bot.logout()
 
 

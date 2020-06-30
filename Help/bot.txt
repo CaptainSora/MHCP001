@@ -6,12 +6,13 @@ Commands with a (+) have their own help page; access them with
 '.cmd help'
 
     Command       Alias  Summary
-(+) .profile      (p)    Information about the player
+(+) .profile      (p)    Player profiles
 (+) .bank         (b)    Currency and interest
 (+) .untouchable  (u)    Free lottery
 (+) .stocks       (s)    Stock market
 (+) .roulette     (r)    Roulette (casino game)
     .time         (utc)  Displays current UTC time
+    .badges              Lists all badges
     .emote               Displays a random emote
     .emotes              Displays all emote triggers (1)
     .gifs                Displays all gif triggers (2)

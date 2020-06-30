@@ -151,12 +151,13 @@ async def interest(ctx, embed, userid):
         text = (
             f"Sorry, you have already claimed your interest for "
             f"`{cur_date}`.\n"
-            f"You can claim again in {mins_left // 60}h {mins_left % 60}m."
+            f"You can claim again in {mins_left // 60}h {mins_left % 60}m.\n"
+            f"Tomorrow's rewards:"
         )
     else:
         bank_dict[userid]['interest']['last_collected'] = cur_date
-        bank_dict[userid]['cor'] += interest_earned
         bank_dict[userid]['interest']['tier'] += 1
+        bank_dict[userid]['cor'] += interest_earned
         text = f"Collected {interest_earned} Cor"
     embed.add_field(name='Interest', value=text)
     embed.add_field(name='Loyalty', value=f'{tier} days', inline=False)

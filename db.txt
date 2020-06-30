@@ -1,0 +1,12 @@
+Find total number of plays, or similar:
+SELECT SUM(qty) FROM ? WHERE userid = ?
+
+Find total value, or similar
+SELECT cor, qty FROM ? WHERE userid = ?
+Then do sumproduct:
+value = sum(prod(x) for x in query_result)
+Alternatively, use row_factory:
+conn.row_factory = lambda cursor, row: prod(row)
+SELECT cor, qty FROM ? WHERE userid = ?
+Then unset the row_factory:
+conn.row_factory = None

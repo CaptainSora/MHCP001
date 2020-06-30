@@ -1,34 +1,34 @@
-- File system
+- Code optimizations + upgrades
     - Race condition (move load/dump closer)
-    - .env
-        - Regenerate new token
-        - Repeat for brawl stars API
-        - Include module colors???
-    - Bot
-        - Change prefix
-        - Yui onboarding
-            - Create channel section for yui-related
-            - Separate channels for diff activities
-            - Onboarding channel in general text
-    - Badges
-        - First for matches
-        - First numerical win
-        - Tiers for interest (by percentage?)
-    - Bank
-        - MODULAR DESIGN DAMMIT
-        - Untouchable (lottery)
-            - Change payout text?
-        - Shop 
-            - Might require cards to be set up
-        - Stocks
-            - leaderboard
-        - Gambling
-            - Roulette
-            - Slots
-            - Blackjack
-            - etc.
-    - SAO Gacha
-        - Tie into card game?
+    - PermissionError: [Errno 13] Permission denied:
+        - Writing to file too often
+    - Make Yui multi-server ready
+        - Add checks for guild, add guild data where necessary
+            - Emotes, gifs, etc.
+        - Requires add/remove emote/gif/reaction commands
+- Generalizations:
+    - File which holds module colors
+- Security
+    - Regenerate new token
+    - Repeat for brawl stars API
+- Quality of Life
+    - Individual channel for each feature
+    - Onboarding channel
+- Existing Features
+    - Untouchable
+        - New history feature
+            - When last achieved matches
+    - Profile/badges
+        - Title selection
+        - Make customizable
+        - Show all badges
+- Upcoming Features
+    - Gambling features
+        - Blackjack
+        - Slots??
+            - Add a progressive jackpot to disguise winnings
+    - Card game
+        - Shop
         - Get card art from SAOMD
         - Daily card?
         - Raid boss
@@ -78,32 +78,35 @@
                     - 0 hp = automatic hospitalization?
                     - Or heals v slowly outside of hospital
                     - Hospital has limited spots, upgradable?
-        - City mechanic
-            - Upgrades requires both Cor and certain materials???
-            - Buildings which give certain (permanent) buffs
-                - Hospital
-                - Barracks
-                - Wall St.
-                    - Unlocks more traders (by changing lambda)
+    - City mechanic
+        - Upgrades requires both Cor and certain materials???
+        - Buildings which give certain (permanent) buffs
+            - Hospital
+            - Barracks
+            - Wall St.
+                - Increases traders (by changing lambda)
+                - Increases traders (flat base guarantee)
+                    - For all, or for self
+                - Increases stock volatility (changes sigma)
+            - Bank
+                - more interest, fixed per day
+                - less timeout on untouchable
+            - Investment firm
+                - Lower fees per trade, both fixed and variable
+            - Research lab
+                - Works by putting funds towards research
+                - Unlocks features
                     - Shows net profit on selling stock
-                    - Guarantees a fixed number of traders (w/o changing lambda)
-                - Bank
-                    - more interest, fixed per day
-                - Investment firm
-                    - Lower fees per trade, both fixed and variable
-                - Research lab
-                    - Works by putting funds towards research
-                    - Unlocks features
-                        - Shows net profit on selling stock
-                        - Allows for "a" command to buy/sell all possible
-                        - Saves a preset for the lottery
-                        - Notifies you if stock price above certain ratio
-                            - Also if you have certain amount
-                            - Also if sellers over certain number
-                - etc.
-            - Permanent buffs are dependent on how much you invest in the buildings
-                - Slight bonus for total investments?
-    - Adventure game
+                    - Allows for "a" command to buy/sell all possible
+                    - Saves a preset for the lottery
+                    - Notifies you if stock price above certain ratio
+                        - Also if you have certain amount
+                        - Also if sellers over certain number
+            - etc.
+        - Permanent buffs are dependent on how much you invest in the buildings
+            - Slight bonus for total investments?
+    - Adventure game?
+        - Text-based
 - Documentation
     - All of it please thanks
     - Files

@@ -84,7 +84,7 @@ def check_history():
             for _ in range(hours_missing):
                 v.insert(0, new_value(v[0], s))
             if len(v) > history_limit:
-                v = v[:history_limit]
+                stock_history['stocks'][s]['values'] = v[:history_limit]
             # Generate new buy/sell numbers
             stock_history['stocks'][s]['buyers'] = gen_traders(buyer_lambda)
             stock_history['stocks'][s]['sellers'] = gen_traders(seller_lambda)

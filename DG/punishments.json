@@ -1,0 +1,19 @@
+{
+    "push-ups": [5, 3],
+    "military push-ups": [4, 2],
+    "chest flys": [30, 15],
+    "overhead presses": [10, 5],
+    "rows": [10, 5],
+    "froggers": [5, 3],
+    "squats": [10, 5],
+    "jump squats": [5, 3],
+    "lunges (each side)": [10, 5],
+    "single-leg calf raises (each side)": [20, 10],
+    "single-leg hamstring bridges (each side)": [10, 5],
+    "plank jacks": [10, 5],
+    "secs low plank": [30, 15],
+    "secs up and down planks": [20, 10],
+    "secs russian twist": [20, 10],
+    "secs bicycle crunches": [20, 10],
+    "plank taps (each side)": [20, 10]
+}

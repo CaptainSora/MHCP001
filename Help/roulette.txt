@@ -4,7 +4,7 @@ Roulette Help Page
 Command: .roulette    Alias: .r
 
 This is a list of arguments passed in the form
-'.stocks (args) (addl args)'.
+'.roulette (args) (addl args)'.
 Additional arguments can be <mandatory> or [optional].
 
 .untouchable ...    Alias   Details

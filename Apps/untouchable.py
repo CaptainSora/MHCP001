@@ -54,12 +54,12 @@ async def rates(ctx, embed):
     await ctx.send(embed=embed)
 
 async def cooldown(ctx, embed, cooldown, time_since_last_play):
+    time_left = cooldown.seconds- time_since_last_play.seconds
+    mins_left = int(time_left / 60)
+    secs_left = time_left % 60
     embed.add_field(
         name='Please wait...',
-        value=(
-            f'Play again in '
-            f'{cooldown.seconds- time_since_last_play.seconds}s ⏱️'
-        )
+        value=(f'Play again in {mins_left}m {secs_left}s ⏱️')
     )
     await ctx.send(embed=embed)
 
@@ -83,8 +83,7 @@ async def lottery(ctx, embed, emotes, guess):
         payout += f"! {emoji}"
     elif matches >= 3:
         embed.colour = 0xffff00
-        emoji = get(emotes, name='✨')
-        payout += f'!!! {emoji}{emoji}{emoji}'
+        payout += f'!!! ✨✨✨'
     embed.add_field(name='Winning Number', value=lotto, inline=False)
     embed.add_field(
         name=f'Matches: {matches}',
@@ -135,7 +134,8 @@ async def leaderboards(ctx, embed, bank_dict, num=-1):
                 user_data[1] = sum(PAYOUTS[k] * win_array[k] for k in range(7))
             else:
                 user_data[1] = win_array[num]
-            lb.append(user_data)
+            if user_data[1] > 0:
+                lb.append(user_data)
         lb.sort(key=lambda x: x[1], reverse=True)
         # Set up grammar
         matches = 'matches'
@@ -228,7 +228,7 @@ async def untouchable(ctx, emotes, args):
     embed = Embed(
         title='UNTOUCHABLE!',
         description=f'Test your luck! Win up to 10 Million Cor!',
-        colour=0xff0033
+        colour=0xffa02d
     )
     # Time data
     now = datetime.now(timezone.utc)

@@ -4,7 +4,7 @@ Lottery Help Page
 Command: .untouchable    Alias: .u
 
 This is a list of arguments passed in the form
-'.stocks (args) (addl args)'.
+'.untouchable (args) (addl args)'.
 Additional arguments can be <mandatory> or [optional].
 
 .untouchable ...    Alias   Details

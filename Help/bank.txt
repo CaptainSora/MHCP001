@@ -4,7 +4,7 @@ Bank Help Page
 Command: .bank    Alias: .b
 
 This is a list of arguments passed in the form
-'.stocks (args)'.
+'.bank (args)'.
 
 .bank ...      Alias  Details
 {no argument}         Displays your current bank balance

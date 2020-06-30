@@ -1,0 +1,68 @@
+{
+    "Achieved &-match in UNTOUCHABLE": {
+        "reqs": [1, 2, 3, 4, 5, 6],
+        "users": [
+            ["CapSora#7528", "Shiro#5564", "mirai#2007", "pho#0639"],
+            ["CapSora#7528", "Shiro#5564", "mirai#2007", "pho#0639"],
+            ["CapSora#7528", "Shiro#5564", "mirai#2007", "pho#0639"],
+            ["CapSora#7528", "Shiro#5564", "mirai#2007"],
+            [],
+            []
+        ]
+    },
+    "& Total plays of UNTOUCHABLE": {
+        "reqs": [250, 500, 1000, 2500, 5000, 10000],
+        "users": [
+            ["CapSora#7528", "mirai#2007", "pho#0639", "Shiro#5564"],
+            ["CapSora#7528"],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    "& Total Profits from Stocks": {
+        "reqs": [5000, 10000, 25000, 50000, 100000, 250000],
+        "users": [
+            ["CapSora#7528", "Shiro#5564", "pho#0639"],
+            ["CapSora#7528", "Shiro#5564"],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    "& Total Plays of Roulette": {
+        "reqs": [500, 1000, 2500, 5000, 10000, 25000],
+        "users": [
+            ["pho#0639", "mirai#2007"],
+            ["pho#0639"],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    "Reached & net Cor in Roulette": {
+        "reqs": [2500, 5000, 10000, 25000, 50000, 100000],
+        "users": [
+            ["pho#0639"],
+            ["pho#0639"],
+            ["pho#0639"],
+            [],
+            [],
+            []
+        ]
+    },
+    "& Days of Bank Loyalty": {
+        "reqs": [9, 15, 25, 42, 75, 175],
+        "users": [
+            ["CapSora#7528", "Shiro#5564", "mirai#2007"],
+            ["CapSora#7528", "Shiro#5564"],
+            [],
+            [],
+            [],
+            []
+        ]
+    }
+}

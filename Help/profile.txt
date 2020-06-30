@@ -1,0 +1,13 @@
+```
+Profile Help Page
+
+Command: .profile    Alias: .p
+
+This is a list of arguments passed in the form
+'.profile (args)'.
+
+.bank ...      Alias  Details
+{no argument}         Displays your profile
+(userid)              Displays the profile of the selected user
+help                  Shows this page
+```

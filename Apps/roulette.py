@@ -57,6 +57,14 @@ def is_win(betstr, num):
         return num == int(betstr)
 
 async def bet(ctx, embed, betstr, betval, userid):
+    # Verify that user has enough cash
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
+    if betval > bank_dict[userid]['cor']:
+        embed.description = "Sorry, you don't have enough money for that."
+        await ctx.send(embed=embed)
+        return
+    # Roll
     num = randrange(37)
     winnings = (-1) * betval
     if is_win(betstr, num):
@@ -70,11 +78,11 @@ async def bet(ctx, embed, betstr, betval, userid):
             embed.colour = 0xffff00
             winnings = 35 * betval
     else:
-        embed.colour = 0x198700
+        embed.colour = 0xb30000
     if betstr in TRANSLATE:
         guess = TRANSLATE[betstr]
     else:
-        guess = str(guess)
+        guess = betstr
     embed.add_field(
         name="Your Guess",
         value=guess
@@ -96,6 +104,7 @@ async def bet(ctx, embed, betstr, betval, userid):
             "plays": 0,
             "winnings": 0
         }
+    bank_dict[userid]['cor'] += winnings
     bank_dict[userid]['roulette']['plays'] += 1
     bank_dict[userid]['roulette']['winnings'] += winnings
     with open('Apps/bank.json', 'w') as f:
@@ -210,7 +219,7 @@ async def roulette(ctx, args):
     elif (args[0] in TRANSLATE) \
             or (args[0].isdecimal() and int(args[0]) >= 0 \
                 and int(args[0]) < 37):
-        if args[1].isdecimal() and int(args[1]) > 0 and int(args[1]) < cap:
+        if args[1].isdecimal() and int(args[1]) > 0 and int(args[1]) <= cap:
             await bet(ctx, embed, args[0], int(args[1]), userid)
     else:
         await instructions(ctx, embed)
