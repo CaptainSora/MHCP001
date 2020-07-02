@@ -8,6 +8,8 @@ from dateutil.parser import parse
 from json import load, dump
 from Help.help import help_page
 
+# Currently allows entering data twice
+
 STATUS = False
 CONN = None
 COOLDOWN = 10
@@ -146,10 +148,11 @@ async def complete_putting(ctx, embed, made, pressure):
         return
     sql_update = (
         "UPDATE throws SET score = ?, pressure = ?, punishment = ?, "
-        "qty = ? WHERE complete_time IS NULL"
+        "qty = ?, complete_time = ? WHERE complete_time IS NULL"
     )
     p = None
     qty = 0
+    embed.description = "Request complete. Starting cooldown timer."
     if made < 10 or pressure < 1:
         with open('DG/punishments.json') as f:
             punishments = load(f)
@@ -160,29 +163,15 @@ async def complete_putting(ctx, embed, made, pressure):
         elif int(dist) == 20:
             i = 1
         qty = punishments[p][i] * ((10 - made) + 2 * (1 - pressure))
-        p_str = str(qty) + ' ' + p
-        embed.description = p_str
+        embed.add_field(name='Punishment', value=f"{qty} {p}")
     else:
-        embed.description = '"Nice work, kid." - Coach Kamogawa'
+        embed.add_field(name="Coach Kamogawa", value="Nice work, kid.")
     await ctx.send(embed=embed)
-    values = (made, pressure, p, qty)
+    now = str(datetime.now(timezone.utc))
+    values = (made, pressure, p, qty, now)
     CONN.execute(sql_update, values)
     CONN.commit()
     payouts(ctx, embed)
-
-async def complete_exercise(ctx, embed):
-    """
-    Requires safety
-    """
-    create_connection()
-    sql_update = (
-        "UPDATE throws SET complete_time = ? WHERE complete_time IS NULL"
-    )
-    now = str(datetime.now(timezone.utc))
-    CONN.execute(sql_update, now)
-    CONN.commit()
-    embed.description = "Request complete. Starting cooldown timer."
-    await ctx.send(embed=embed)
 
 def duration_ago(timestamp):
     now = datetime.now(timezone.utc)
@@ -210,7 +199,7 @@ async def print_unfinished_request(ctx, embed, values=None):
             "SELECT flags, distance, throw_type, userid, request_time "
             "FROM throws WHERE complete_time IS NULL"
         )
-        values = CONN.execute(sql)[0]
+        values = CONN.execute(sql).fetchone()
         embed.description = f"Unfinished request by {values[3]}"
         embed.add_field(name="Distance", value=f"{values[1]}'")
         embed.add_field(name="Putt Type", value=f"{values[2]}")
@@ -291,11 +280,12 @@ async def dg(ctx, args):
         elif len(args) >= 3 and args[0] in ['p', 'putting']:
             if args[1].isdecimal() and args[2].isdecimal():
                 await complete_putting(ctx, embed, int(args[1]), int(args[2]))
-        elif args[0] in ['c', 'complete']:
-            await complete_exercise(ctx, embed)
         elif args[0] in ['override']:
             pass
     else:
-        await create_request(ctx, embed, ' '.join(args))
+        if not STATUS:
+            await check_status(ctx, embed)
+        else:
+            await create_request(ctx, embed, ' '.join(args))
 
 create_connection()
