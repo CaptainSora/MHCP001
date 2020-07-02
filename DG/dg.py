@@ -1,7 +1,7 @@
 from random import choice
 from discord import Embed
 import sqlite3
-from Apps.bank import id
+from Apps.bank import id, add_cor
 from datetime import datetime, timedelta, timezone
 from dateutil import tz
 from dateutil.parser import parse
@@ -27,6 +27,7 @@ def create_connection():
 
 def close_connection():
     if CONN is not None:
+        CONN.commit()
         CONN.close()
 
 def create_db():
@@ -57,6 +58,7 @@ def create_db():
     )
     CONN.execute(sql_create_throws)
     CONN.execute(sql_create_dgpayouts)
+    CONN.commit()
     
 async def create_request(ctx, embed, flags):
     create_connection()
@@ -94,6 +96,7 @@ async def create_request(ctx, embed, flags):
     request_time = str(datetime.now(timezone.utc))
     values = (flags, dist, throw_type, userid, request_time)
     CONN.execute(sql, values)
+    CONN.commit()
     await ping_owner(ctx)
     await print_unfinished_request(ctx, embed, values)
     return values
@@ -126,16 +129,14 @@ async def payouts(ctx, embed):
     # CapSora
     cor2 = score * BASE_COR * multiplier
     CONN.execute(sql, (request_id, 'CapSora#7528', cor2, now))
+    CONN.commit()
     # Embed
     embed.description = "Payouts"
     embed.add_field(name=userid, value=f"{cor1}")
     embed.add_field(name='CapSora#7528', value=f"{cor2}")
     # REMOVE ME AFTER MIGRATION
-    with open('Apps/bank.json', 'w') as f:
-        bank_dict = load(f)
-        bank_dict[userid]['cor'] += cor1
-        bank_dict['CapSora#7528']['cor'] += cor2
-        dump(bank_dict, f)
+    add_cor(userid, cor1)
+    add_cor("CapSora#7528", cor2)
 
 async def complete_putting(ctx, embed, made, pressure):
     create_connection()
@@ -166,6 +167,7 @@ async def complete_putting(ctx, embed, made, pressure):
     await ctx.send(embed=embed)
     values = (made, pressure, p, qty)
     CONN.execute(sql_update, values)
+    CONN.commit()
     payouts(ctx, embed)
 
 async def complete_exercise(ctx, embed):
@@ -178,6 +180,7 @@ async def complete_exercise(ctx, embed):
     )
     now = str(datetime.now(timezone.utc))
     CONN.execute(sql_update, now)
+    CONN.commit()
     embed.description = "Request complete. Starting cooldown timer."
     await ctx.send(embed=embed)
 
@@ -217,10 +220,11 @@ async def print_unfinished_request(ctx, embed, values=None):
 def unfinished_request(col='rowid'):
     """
     Returns the value of the unfinished request, or None.
+    Vulnerable to SQL Injection.
     """
     create_connection()
-    sql = "SELECT ? FROM throws WHERE complete_time IS NULL"
-    row = CONN.execute(sql, (col,)).fetchall()
+    sql = f"SELECT {col} FROM throws WHERE complete_time IS NULL"
+    row = CONN.execute(sql).fetchall()
     if row:
         if col == '*':
             return row[0]
@@ -289,6 +293,8 @@ async def dg(ctx, args):
                 await complete_putting(ctx, embed, int(args[1]), int(args[2]))
         elif args[0] in ['c', 'complete']:
             await complete_exercise(ctx, embed)
+        elif args[0] in ['override']:
+            pass
     else:
         await create_request(ctx, embed, ' '.join(args))
 

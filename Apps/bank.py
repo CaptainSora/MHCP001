@@ -167,6 +167,13 @@ async def interest(ctx, embed, userid):
     with open('Apps/bank.json', 'w') as f:
         dump(bank_dict, f)
 
+def add_cor(userid, value):
+    with open('Apps/bank.json') as f:
+        bank_dict = load(f)
+    bank_dict[userid]['cor'] += value
+    with open('Apps/bank.json', 'w') as f:
+        dump(bank_dict, f)
+
 # Used for stocks
 # Edits bank.json
 async def purchase(userid, value, objtype=None, obj=None, qty=None):
