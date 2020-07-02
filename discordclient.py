@@ -13,6 +13,7 @@ import Apps.roulette
 import Apps.stocks
 import Apps.untouchable
 import Apps.profile
+import DG.dg
 from Help.help import help_page
 
 load_dotenv()
@@ -96,7 +97,7 @@ async def utc_time_wrapper(ctx, *args):
 
 @bot.command(name='bank', aliases=['b'])
 async def bank_wrapper(ctx, *args):
-    await Apps.bank.bank(ctx, args)
+   await Apps.bank.bank(ctx, args)
 
 @bot.command(name='untouchable', aliases=['u'])
 async def untouchable_wrapper(ctx, *args):
@@ -113,6 +114,10 @@ async def roulette_wrapper(ctx, *args):
 @bot.command(name='profile', aliases=['p'])
 async def profile_wrapper(ctx, *args):
     await Apps.profile.profile(ctx, args)
+
+@bot.command(name='dg')
+async def dg_wrapper(ctx, *args):
+    await DG.dg.dg(ctx, args)
 
 @bot.command(name='badges')
 async def badge_wrapper(ctx, *args):

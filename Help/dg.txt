@@ -1,0 +1,21 @@
+```
+DG Help Page
+
+Command: .dg
+
+Use .dg status to check if requests are open
+
+To make me suffer, use .dg (flags)
+  e.g. '.dg -20 -d'
+Flags are optional and can be input in any order
+
+Flags:
+-s      Force straddle putt (otherwise 50% chance)
+-l      Force lunge putt (otherwise 50% chance)
+-15     Force putt from 15' (otherwise 25% chance)
+-20     Force putt from 20' (otherwise 75% chance)
+-d      Double all rewards (and punishments)
+
+Notes:
+Putting from 15' has double payouts for you and larger punishments for me
+```
