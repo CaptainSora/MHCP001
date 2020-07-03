@@ -25,8 +25,8 @@
         "reqs": [5000, 10000, 25000, 50000, 100000, 250000],
         "users": [
             ["CapSora#7528", "Shiro#5564", "pho#0639"],
-            ["CapSora#7528", "Shiro#5564"],
-            [],
+            ["CapSora#7528", "Shiro#5564", "pho#0639"],
+            ["CapSora#7528"],
             [],
             [],
             []
@@ -57,8 +57,8 @@
     "& Days of Bank Loyalty": {
         "reqs": [9, 15, 25, 42, 75, 175],
         "users": [
+            ["CapSora#7528", "Shiro#5564", "mirai#2007", "pho#0639"],
             ["CapSora#7528", "Shiro#5564", "mirai#2007"],
-            ["CapSora#7528", "Shiro#5564"],
             [],
             [],
             [],

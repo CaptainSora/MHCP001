@@ -68,6 +68,7 @@ async def create_request(ctx, embed, flags):
         embed.description = "There is already an existing request."
         await ctx.send(embed=embed)
         await ping_owner(ctx)
+        await print_unfinished_request(ctx, embed)
         return
     cd = cooldown()
     if cd > 0:
@@ -105,10 +106,14 @@ async def create_request(ctx, embed, flags):
 
 async def payouts(ctx, embed):
     """
-    Must be called after putts completed and before timestamp added
+    Must be called after putts completed
     """
     create_connection()
-    throw_entry = unfinished_request(col='*')
+    sql_last = (
+        "SELECT request_id, flags, distance, userid, score, pressure "
+        "FROM throws ORDER BY request_id DESC LIMIT 1"
+    )
+    throw_entry = CONN.execute(sql_last).fetchone()
     sql = (
         "INSERT INTO dgpayouts(request_id, userid, cor, timestamp) "
         "VALUES(?,?,?,?)"
@@ -117,8 +122,8 @@ async def payouts(ctx, embed):
     request_id = throw_entry[0]
     flags = throw_entry[1]
     dist = throw_entry[2]
-    userid = throw_entry[4]
-    score = throw_entry[6] + 2 * throw_entry[7]  # Max 12
+    userid = throw_entry[3]
+    score = throw_entry[4] + 2 * throw_entry[5]  # Max 12
     multiplier = 1
     if '-d' in flags:
         multiplier *= 2
@@ -134,8 +139,10 @@ async def payouts(ctx, embed):
     CONN.commit()
     # Embed
     embed.description = "Payouts"
+    embed.clear_fields()
     embed.add_field(name=userid, value=f"{cor1}")
     embed.add_field(name='CapSora#7528', value=f"{cor2}")
+    await ctx.send(embed=embed)
     # REMOVE ME AFTER MIGRATION
     add_cor(userid, cor1)
     add_cor("CapSora#7528", cor2)
@@ -153,25 +160,31 @@ async def complete_putting(ctx, embed, made, pressure):
     p = None
     qty = 0
     embed.description = "Request complete. Starting cooldown timer."
+    embed.add_field(name="Result", value=f"{made}/10")
+    embed.add_field(name="Pressure", value=f"{pressure}/1")
     if made < 10 or pressure < 1:
         with open('DG/punishments.json') as f:
             punishments = load(f)
-        p = choice(punishments)
+        p = choice(list(punishments.keys()))
         dist = unfinished_request(col='distance')
         if int(dist) == 15:
             i = 0
         elif int(dist) == 20:
             i = 1
         qty = punishments[p][i] * ((10 - made) + 2 * (1 - pressure))
-        embed.add_field(name='Punishment', value=f"{qty} {p}")
+        embed.add_field(name='Punishment', value=f"{qty} {p}", inline=False)
     else:
-        embed.add_field(name="Coach Kamogawa", value="Nice work, kid.")
+        embed.add_field(
+            name="Coach Kamogawa",
+            value="Nice work, kid.",
+            inline=False
+        )
     await ctx.send(embed=embed)
     now = str(datetime.now(timezone.utc))
     values = (made, pressure, p, qty, now)
     CONN.execute(sql_update, values)
     CONN.commit()
-    payouts(ctx, embed)
+    await payouts(ctx, embed)
 
 def duration_ago(timestamp):
     now = datetime.now(timezone.utc)
@@ -193,17 +206,19 @@ def duration_ago(timestamp):
 async def print_unfinished_request(ctx, embed, values=None):
     if unfinished_request() is None:
         embed.description = f'No unfinished requests.'
-    elif values is None:
+        await ctx.send(embed=embed)
+        return
+    if values is None:
         create_connection()
         sql = (
             "SELECT flags, distance, throw_type, userid, request_time "
             "FROM throws WHERE complete_time IS NULL"
         )
         values = CONN.execute(sql).fetchone()
-        embed.description = f"Unfinished request by {values[3]}"
-        embed.add_field(name="Distance", value=f"{values[1]}'")
-        embed.add_field(name="Putt Type", value=f"{values[2]}")
-        embed.add_field(name="Requested", value=duration_ago(values[4]))
+    embed.description = f"Unfinished request by {values[3]}"
+    embed.add_field(name="Distance", value=f"{values[1]}'")
+    embed.add_field(name="Putt Type", value=f"{values[2]}")
+    embed.add_field(name="Requested", value=duration_ago(values[4]))
     await ctx.send(embed=embed)
 
 def unfinished_request(col='rowid'):
@@ -275,7 +290,7 @@ async def dg(ctx, args):
         elif len(args) >= 2 and args[0] in ['cooldown']:
             if args[1].isdecimal():
                 COOLDOWN = int(args[1])
-                embed.description = f"Cooldown set to {COOLDOWN} minutes."
+                embed.description = f"Cooldown set to {COOLDOWN} minute(s)."
                 await ctx.send(embed=embed)
         elif len(args) >= 3 and args[0] in ['p', 'putting']:
             if args[1].isdecimal() and args[2].isdecimal():

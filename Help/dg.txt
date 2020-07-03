@@ -18,4 +18,8 @@ Flags:
 
 Notes:
 Putting from 15' has double payouts for you and larger punishments for me
+
+Base Payouts:
+Caller: 20 Cor per missed putt, double for pressure putt
+Me: 10 Cor per made putt, double for pressure putt
 ```
