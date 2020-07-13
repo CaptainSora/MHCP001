@@ -14,7 +14,7 @@
         "reqs": [250, 500, 1000, 2500, 5000, 10000],
         "users": [
             ["CapSora#7528", "mirai#2007", "pho#0639", "Shiro#5564"],
-            ["CapSora#7528"],
+            ["CapSora#7528", "pho#0639", "mirai#2007", "Shiro#5564"],
             [],
             [],
             [],
@@ -22,10 +22,10 @@
         ]
     },
     "& Total Profits from Stocks": {
-        "reqs": [5000, 10000, 25000, 50000, 100000, 250000],
+        "reqs": [10000, 25000, 50000, 100000, 250000, 500000],
         "users": [
             ["CapSora#7528", "Shiro#5564", "pho#0639"],
-            ["CapSora#7528", "Shiro#5564", "pho#0639"],
+            ["CapSora#7528", "Shiro#5564"],
             ["CapSora#7528"],
             [],
             [],
@@ -59,7 +59,7 @@
         "users": [
             ["CapSora#7528", "Shiro#5564", "mirai#2007", "pho#0639"],
             ["CapSora#7528", "Shiro#5564", "mirai#2007"],
-            [],
+            ["CapSora#7528", "Shiro#5564", "mirai#2007"],
             [],
             [],
             []

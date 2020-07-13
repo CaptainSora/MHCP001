@@ -287,7 +287,7 @@ async def trade(ctx, embed, userid, args, buy=True):
 
 async def sell_confirmed(message, fields, userid):
     # Field 0: Name, Brief
-    name = fields[0].name.split()[1]
+    name = ' '.join(fields[0].name.split()[1:-1])
     brief = fields[0].name[-4:-1]
     # Field 0: Quantity
     qty = (-1) * int(fields[0].value.split()[0])

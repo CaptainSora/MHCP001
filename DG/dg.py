@@ -12,7 +12,7 @@ from Help.help import help_page
 
 STATUS = False
 CONN = None
-COOLDOWN = 10
+COOLDOWN = 5
 
 async def ping_owner(ctx, message=''):
     if not message:
@@ -77,6 +77,7 @@ async def create_request(ctx, embed, flags):
         embed.description = (
             f'Cooldown active. Try again in {mins}m {secs}s. ⏱️'
         )
+        await ctx.send(embed=embed)
         return
     sql = (
         "INSERT INTO throws(flags, distance, throw_type, userid, request_time)"
@@ -124,17 +125,16 @@ async def payouts(ctx, embed):
     dist = throw_entry[2]
     userid = throw_entry[3]
     score = throw_entry[4] + 2 * throw_entry[5]  # Max 12
-    multiplier = 1
-    if '-d' in flags:
-        multiplier *= 2
     now = str(datetime.now(timezone.utc))
     # Requester
-    cor1 = (12 - score) * BASE_COR * multiplier * 2
+    cor1 = (12 - score) * BASE_COR * 2
     if dist == '15':
         cor1 *= 2
     CONN.execute(sql, (request_id, userid, cor1, now))
     # CapSora
-    cor2 = score * BASE_COR * multiplier
+    cor2 = score * BASE_COR
+    if '-d' in flags:
+        cor2 *= 2
     CONN.execute(sql, (request_id, 'CapSora#7528', cor2, now))
     CONN.commit()
     # Embed
@@ -219,6 +219,8 @@ async def print_unfinished_request(ctx, embed, values=None):
     embed.add_field(name="Distance", value=f"{values[1]}'")
     embed.add_field(name="Putt Type", value=f"{values[2]}")
     embed.add_field(name="Requested", value=duration_ago(values[4]))
+    if '-d' in values[0]:
+        embed.add_field(name="Modifiers", value="Doubled!")
     await ctx.send(embed=embed)
 
 def unfinished_request(col='rowid'):

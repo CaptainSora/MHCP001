@@ -93,7 +93,20 @@ async def lottery(ctx, embed, emotes, guess):
     elif matches == 6:
         embed.colour = 0xffff00
         payout += f'!!!!!! 👑👑👑👑👑👑'
-    embed.add_field(name='Winning Number', value=lotto, inline=False)
+    lotto_ul = []
+    for i in range(len(lotto)):
+        if lotto[i] == str(guess)[i]:
+            if lotto_ul and lotto_ul[-1] == "__":
+                lotto_ul.insert(-1, lotto[i])
+            else:
+                lotto_ul.extend(["__", lotto[i], "__"])
+        else:
+            lotto_ul.append(lotto[i])
+    embed.add_field(
+        name='Winning Number',
+        value=''.join(lotto_ul),
+        inline=False
+    )
     embed.add_field(
         name=f'Matches: {matches}',
         value=payout
