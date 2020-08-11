@@ -17,7 +17,7 @@ import DG.dg
 from Help.help import help_page
 
 load_dotenv()
-TOKEN = getenv('API_ACCESS')
+API_ACCESS = getenv('API_ACCESS')
 
 bot = commands.Bot(command_prefix='.')
 bot.remove_command('help')
@@ -217,4 +217,4 @@ async def confirm(message):
             await Apps.stocks.sell_confirmed(message, fields, str(user))
 
 
-bot.run(TOKEN)
+bot.run(API_ACCESS)

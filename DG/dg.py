@@ -140,8 +140,8 @@ async def payouts(ctx, embed):
     # Embed
     embed.description = "Payouts"
     embed.clear_fields()
-    embed.add_field(name=userid, value=f"{cor1}")
-    embed.add_field(name='CapSora#7528', value=f"{cor2}")
+    embed.add_field(name=userid, value=f"{cor1} Cor")
+    embed.add_field(name='CapSora#7528', value=f"{cor2} Cor")
     await ctx.send(embed=embed)
     # REMOVE ME AFTER MIGRATION
     add_cor(userid, cor1)

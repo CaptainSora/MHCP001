@@ -15,7 +15,7 @@
         "users": [
             ["CapSora#7528", "mirai#2007", "pho#0639", "Shiro#5564"],
             ["CapSora#7528", "pho#0639", "mirai#2007", "Shiro#5564"],
-            [],
+            ["CapSora#7528"],
             [],
             [],
             []
@@ -27,7 +27,7 @@
             ["CapSora#7528", "Shiro#5564", "pho#0639"],
             ["CapSora#7528", "Shiro#5564"],
             ["CapSora#7528"],
-            [],
+            ["CapSora#7528"],
             [],
             []
         ]
