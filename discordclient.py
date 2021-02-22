@@ -17,6 +17,7 @@ import Apps.profile
 import DG.dg
 import DG.archery
 import GuardianTales.scarecrow
+import Zodiac.zodiac
 from Help.help import help_page
 
 load_dotenv()
@@ -151,6 +152,10 @@ async def sc(ctx):
 @bot.command(name='roster')
 async def roster(ctx):
     await GuardianTales.scarecrow.get_roster(ctx)
+
+@bot.command(name='zodiac', aliases=['date', 'z'])
+async def zodiac(ctx, *args):
+    await Zodiac.zodiac.zodiac_wrapper(ctx, args)
 
 @bot.event
 async def on_message(message):

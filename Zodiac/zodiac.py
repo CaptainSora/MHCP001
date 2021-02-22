@@ -1,9 +1,4 @@
-from dategen import random_day
+from Zodiac.dategen import random_day
 
-def foo():
-    somedate = random_day()
-    print(somedate.day)
-    print(somedate.month)
-    print(somedate.year)
-
-foo()
+async def zodiac_wrapper(ctx, args):
+    await ctx.send("Nothing here yet...")
