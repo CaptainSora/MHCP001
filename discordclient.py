@@ -9,11 +9,14 @@ from discord.utils import get
 from dotenv import load_dotenv
 
 import Apps.bank
+import Apps.dl_emotes
 import Apps.roulette
 import Apps.stocks
 import Apps.untouchable
 import Apps.profile
 import DG.dg
+import DG.archery
+import GuardianTales.scarecrow
 from Help.help import help_page
 
 load_dotenv()
@@ -79,6 +82,10 @@ async def emote(ctx):
 async def emotes(ctx):
     await ctx.send('\n'.join(sorted(list(emote_dict.keys()))))
 
+@bot.command(name="dl")
+async def dl(ctx, *args):
+    await Apps.dl_emotes.dl_emote(ctx, args)
+
 @bot.command(name='gifs')
 async def gifs(ctx):
     entries = sorted([str(x) for x in gif_dict.keys()])
@@ -137,9 +144,27 @@ async def logout(ctx):
     await ctx.send("Logging off. Goodnight!")
     await bot.logout()
 
+@bot.command(name='scarcrow', aliases=['sc'])
+async def sc(ctx):
+    await GuardianTales.scarecrow.sc_totals(ctx)
+
+@bot.command(name='roster')
+async def roster(ctx):
+    await GuardianTales.scarecrow.get_roster(ctx)
 
 @bot.event
 async def on_message(message):
+    archery = bot.get_channel(808155589385125898)
+    me = bot.get_user(278589912184258562)
+    botid = bot.get_user(279321031989264384)
+    if message.author == botid:
+        return
+    if message.channel == archery:
+        if message.author != me:
+            await message.channel.send("Hey, what are you doing here?")
+            return
+        await DG.archery.dg_archery(archery, message.content)
+        return
     if not dict_ready:
         return
     if message.author == bot.user:

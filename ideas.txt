@@ -1,0 +1,109 @@
+Core mechanic:
+    Basic Combat:
+        Time Unit-based Combat
+        Each character has multiple moves available to them, which costs TU
+        You can prepare a team to bring into combat (max. 4 members)
+        Pick from a set number of moves
+            E.g. Deal 200% of PWR
+        Damage formula: Look at pokemon?
+            https://bulbapedia.bulbagarden.net/wiki/Damage#Damage_calculation
+    Combat styles:
+        Basic combat (see above)
+        Survival (survive for certain time limit)
+        Raid battles
+            Each player fights boss on own time, damage to boss is cumulative
+            Can be time-limited events
+        Co-op battles
+            Frontline and backline teams
+            Only frontline teams can directly damage the boss/enemies
+            Backline teams may be able to avoid damage
+            Buffs/heals can be given to specific teams
+            Backline can still debuff if it's not direct damage
+    Status conditions???
+        LIMIT TO ONLY A FEW THANKS
+        Frozen increases physical damage taken (percentage of incoming damage)
+        Bleeding increases magic damage taken (percentage of incoming damage)
+        Chained decreases physical damage given (percentage of outgoing damage)
+        Confused decreases magic damage given (percentage of outgoing damage)
+        Poisoned prevents healing, some DOT? (10% of max HP per turn, lasts either TU or turns)
+        Burned inflicts DOT (15% of max HP per turn, lasts either turns or TU)
+        Enraged increases PWR and INT, lowers ARM and RES
+        Petrified decreases AGI, ARM, RES
+        Cursed
+        Silenced
+        Weakened
+        Blinded decreases hit rate
+        Slowed increases TU cost of any move (fixed or percentage?)
+        Guarding takes damage in place of allies
+        Defending reduces incoming damage
+        Invisible makes user untargetable, lasts turns or until attacking move
+        Doom has a chance to cause instant death after certain TU or turns
+        Enemies can have resistances to certain status conditions
+            i.e. probabilistically resisting status conditions
+    Stats:
+        PAtk (Power) PWR
+        MAtk (Intellect) INT or Wisdom WIS
+        PDef (Armor) ARM
+        MDef (Resistance) RES
+        HP (Life) LFE
+        Spd (Agility) AGI
+    Formation?
+        Maybe 2x4 grid, you can place characters in spots which give buffs
+        Each character can have a passive formation buff
+            E.g. characters above get +10% atk, characters to left get +10% def, etc.
+        Certain characters can also have a partner formation buff
+            E.g. boost if the partner character is in the party
+    Types of moves:
+        Physical, Magical
+    Factions:
+        Possibly 5 factions?
+        Probably RPSLS style strength/weakness
+        Faction buff for 2 and 4 members in the party
+        Unfactioned for certain (raid) boss enemies
+    Characters
+        Rarities: (Border)
+            Common (White/Grey)
+            Rare (Blue)
+            Epic (Purple)
+            Legendary (Yellow/Gold)
+        Tiers: (Number of stars)
+            None (0)
+            Learned (1)
+            Enlightened (2)
+            Ascended (3), with bonus art
+        Levelling?
+            Probably no level cap
+            Exponential increase in EXP required
+            EXP as currency
+            Rarer characters take more EXP to level
+        Research Tree?
+            Certain tiers require a certain level
+            Can unlock stat boosts, power up moves, etc.
+        Equippable items
+            Can boost stats, add passives, can be conditional on faction etc.
+            Rarer characters can unlock more item slots based on rarity
+            Items are rare mob/boss drops. Independent between players
+            Certain tiers of items dropped from certain enemies
+    Moveset
+        Start with 2-3 moves depending on rarity
+        Can unlock other moves by awakening
+Quests & achievements?
+Side mechanics
+    Upgrade item drops like ototo corps from battle cats
+    Random maze/dungeon to grind materials
+    Affiliation bonus with each faction for damage boost?
+Slight level scaling for rare bosses (scalpel, not chainsaw)
+Hide enemy statistics, revealed on enemy bestiary completion or some other Research
+Some enemies may have reset points (i.e. knockbacks from battle cats)
+    Cannot take damage past reset point
+    Incur TU cost, reset any gauges
+Do faction quests to earn bonuses for faction characters
+Summon mechanics:
+    Resonance: (Random gen number, lower is better)
+    Repeat summons give Tuning Crystals
+    Summon currency: Amplifiers (Amps)
+
+MUSIC THEMED
+
+Minigame mechanic: lockpicking
+    Can extend to master key finding
