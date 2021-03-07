@@ -421,8 +421,8 @@ async def leaderboards(ctx, embed):
         )
     await ctx.send(embed=embed)
 
-for s in sorted(['NVG', 'AUG', 'AMS', 'STL', 'MCB']):
-    print(s, stock_home_value(s))
+# for s in sorted(['NVG', 'AUG', 'AMS', 'STL', 'MCB']):
+#     print(s, stock_home_value(s))
 
 async def stocks(ctx, emojis, args):
     # User check

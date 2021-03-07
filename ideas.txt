@@ -107,3 +107,10 @@ MUSIC THEMED
 
 Minigame mechanic: lockpicking
     Can extend to master key finding
+
+Exploration like "A Dark Room"
+    Road building
+        First paths which progress by usage, then costs (a lot) for upgrading
+            See https://www.youtube.com/watch?v=PIK6I6Q58Ec
+    Differing move speed per unit (tiles per day)
+    Emergency rations which are heavy but allow 

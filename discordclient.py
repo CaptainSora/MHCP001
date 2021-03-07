@@ -54,30 +54,30 @@ async def on_ready():
 async def help(ctx):
     await help_page(ctx, "bot")
 
-@bot.command(name='poke')
-async def poke(ctx):
-    phrases = [
-        "Hey! No fair!",
-        "No more poking. Hmpf.",
-        "What's up?",
-        "You called?",
-        "\\*yawns\\*"
-    ]
-    await ctx.send(choice(phrases))
+# @bot.command(name='poke')
+# async def poke(ctx):
+#     phrases = [
+#         "Hey! No fair!",
+#         "No more poking. Hmpf.",
+#         "What's up?",
+#         "You called?",
+#         "\\*yawns\\*"
+#     ]
+#     await ctx.send(choice(phrases))
 
-@bot.command(name='taco')
-async def taco(ctx):
-    phrases = [
-        "Om nom nom...",
-        "Mmm, tacos...",
-        "Spicy!!",
-        "Ish sho good!"
-    ]
-    await ctx.send(choice(phrases))
+# @bot.command(name='taco')
+# async def taco(ctx):
+#     phrases = [
+#         "Om nom nom...",
+#         "Mmm, tacos...",
+#         "Spicy!!",
+#         "Ish sho good!"
+#     ]
+#     await ctx.send(choice(phrases))
 
-@bot.command(name='emote')
-async def emote(ctx):
-    await ctx.send(choice(bot.emojis))
+# @bot.command(name='emote')
+# async def emote(ctx):
+#     await ctx.send(choice(bot.emojis))
 
 @bot.command(name='emotes')
 async def emotes(ctx):
@@ -156,6 +156,19 @@ async def roster(ctx):
 @bot.command(name='zodiac', aliases=['date', 'z'])
 async def zodiac(ctx, *args):
     await Zodiac.zodiac.zodiac_wrapper(ctx, args)
+
+@bot.command(name='echo')
+async def echo(ctx, *args):
+    await ctx.message.delete()
+    me = bot.get_user(278589912184258562)
+    if ctx.message.author == me:
+        await ctx.send(' '.join(args))
+
+@bot.command(name='waluigi', aliases=['wah', 'w'])
+async def waluigi(ctx, *args):
+    if len(args) == 0:
+        return
+    await ctx.send(' '.join(args).replace('wa', 'WAH').replace('wha', 'WAH'))
 
 @bot.event
 async def on_message(message):
