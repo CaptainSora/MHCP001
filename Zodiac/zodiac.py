@@ -55,9 +55,9 @@ def pokeCalendar(gen, searchdate):
 
     # Feb 29 Check
     if searchdate.day == 29 and searchdate.month == 2 and gen == 5:
-        return "Feb 29: The " + feb29[0][3:-1] + ", " + curSeason
+        return "Feb 29: " + feb29[0][3:-1] + ", " + curSeason
     elif searchdate.day == 29 and searchdate.month == 2 and gen == 4:
-        return "Feb 29: Day of the Cloning"
+        return "Feb 29: The Day of the Cloning"
     elif searchdate.day == 29 and searchdate.month == 2 and (gen == 6 or gen == 7):
         return "Feb 29: The " + feb29[0][3:-1] + " in the " + curReign + ", " + curSeason
 
