@@ -1,8 +1,8 @@
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from random import randint
 
 def random_day():
     """
-    Returns a date object. For testing purposes only.
+    Returns a datetime object. For testing purposes only.
     """
-    return date.today() + timedelta(days=randint(-10000, 10000))
+    return datetime.now() + timedelta(days=randint(-10000, 10000))
