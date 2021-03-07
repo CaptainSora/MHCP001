@@ -17,14 +17,14 @@ def convertSeasonDate(date, refdate):
     dateObject = datetime.strptime(date, "%B %d")
     return dateObject.replace(year=refdate.year)
 
+def isJan1(date):
+    return date.month == 1 and date.day == 1
+
 def isFeb29(date):
     return date.month == 2 and date.day == 29
 
-def isNewYears(date):
-    return (
-        (date.month == 1 and date.day == 1) or 
-        (date.month == 12 and date.day == 31)
-    )
+def isDec31(date):
+    return date.month == 12 and date.day == 31
 
 def pokeCalendar(gen, searchdate):
 
@@ -84,7 +84,9 @@ def pokeCalendar(gen, searchdate):
                 "Feb 29: The " + feb29[0][3:-1] + " in the " + curReign + ", "
                 + curSeason
             )
-    elif gen == 4 and isNewYears(searchdate):
+    elif gen == 4 and isJan1(searchdate):
+        pass
+    elif gen == 4 and isDec31(searchdate):
         pass
 
     # Regular date
