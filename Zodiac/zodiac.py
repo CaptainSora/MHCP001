@@ -5,10 +5,28 @@ from discord import Embed
 
 from Zodiac.dategen import random_day
 
-### Shiro222
-def pokeCalendar(gen, searchdate):
 
-    # randdate = random_day()
+def convertReignDate(date, refdate):
+    dateObject = datetime.strptime("2000 " + date, "%Y %m/%d")
+    try:
+        return dateObject.replace(year=refdate.year)
+    except ValueError:
+        return datetime(refdate.year, 2, 28)
+
+def convertSeasonDate(date, refdate):
+    dateObject = datetime.strptime(date, "%B %d")
+    return dateObject.replace(year=refdate.year)
+
+def isFeb29(date):
+    return date.month == 2 and date.day == 29
+
+def isNewYears(date):
+    return (
+        (date.month == 1 and date.day == 1) or 
+        (date.month == 12 and date.day == 31)
+    )
+
+def pokeCalendar(gen, searchdate):
 
     with open(f"Zodiac/gen{gen}.txt", "r", encoding = "utf-8") as f:
         megalist = f.read().strip().split("\n")
@@ -50,31 +68,30 @@ def pokeCalendar(gen, searchdate):
 
 
     dateString = searchdate.strftime("%b %d").replace(" 0"," ")
-    curSeason = curSeason.title().replace(" Of ", " of ").replace(" The ", " the ")
+    curSeason = (
+        curSeason.title().replace(" Of ", " of ").replace(" The ", " the ")
+    )
     curReign = curReign.replace("The ", "")
 
-    # Feb 29 Check
-    if searchdate.day == 29 and searchdate.month == 2 and gen == 5:
-        return "Feb 29: " + feb29[0][3:-1] + ", " + curSeason
-    elif searchdate.day == 29 and searchdate.month == 2 and gen == 4:
-        return "Feb 29: The Day of the Cloning"
-    elif searchdate.day == 29 and searchdate.month == 2 and (gen == 6 or gen == 7):
-        return "Feb 29: The " + feb29[0][3:-1] + " in the " + curReign + ", " + curSeason
+    # Edge case date
+    if isFeb29(searchdate):
+        if gen == 4:
+            return "Feb 29: The Day of the Cloning"
+        elif gen == 5:
+            return "Feb 29: " + feb29[0][3:-1] + ", " + curSeason
+        else:
+            return (
+                "Feb 29: The " + feb29[0][3:-1] + " in the " + curReign + ", "
+                + curSeason
+            )
+    elif gen == 4 and isNewYears(searchdate):
+        pass
 
-    return dateString + ": The " + curDate + " in the " + curReign + ", " + curSeason
-
-
-def convertReignDate(date, refdate):
-    dateObject = datetime.strptime("2000 " + date, "%Y %m/%d")
-    try:
-        return dateObject.replace(year=refdate.year)
-    except ValueError:
-        return datetime(refdate.year, 2, 28)
-
-
-def convertSeasonDate(date, refdate):
-    dateObject = datetime.strptime(date, "%B %d")
-    return dateObject.replace(year=refdate.year)
+    # Regular date
+    return (
+        dateString + ": The " + curDate + " in the " + curReign + ", "
+        + curSeason
+    )
 
 
 ### CapSora
