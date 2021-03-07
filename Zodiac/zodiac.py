@@ -28,9 +28,10 @@ def isDec31(date):
     return date.month == 12 and date.day == 31
 
 
-# MAIN
 def pokeCalendar(gen, searchdate):
-
+    """
+    Generates the Pokemon Zodiac string for a generation and date.
+    """
     with open(f"Zodiac/gen{gen}.txt", "r", encoding = "utf-8") as f:
         megalist = f.read().strip().split("\n")
     
@@ -104,7 +105,7 @@ def pokeCalendar(gen, searchdate):
     )
 
 
-### CapSora
+# Discord input parsing
 def get_generation(userid):
     with open('Zodiac/prefs.json', 'r') as f:
         prefdict = load(f)
@@ -142,6 +143,36 @@ async def zodiac_wrapper(ctx, args):
     if len(args) == 0:
         # default generation, no custom date
         gen = get_generation(ctx.author.id)
+    elif args[0].lower() in ['help', 'h']:
+        embed.description = (
+            "Command: .zodiac (gen) (date)\n"
+            "Alias: .z"
+        )
+        embed.add_field(
+            name='gen (optional)',
+            value='An integer between 4 and 7 inclusive',
+            inline=False
+        )
+        embed.add_field(
+            name='date (optional)',
+            value=(
+                'A date string. Most standard formats will be recognized.'
+            ),
+            inline=False
+        )
+        await ctx.send(embed=embed)
+        return
+    elif args[0].lower() in ['history', 'backstory', 'story']:
+        with open('Zodiac/history.txt', 'r', encoding='utf-8') as f:
+            historylist = f.read().split('\n\n')
+        for par in historylist:
+            embed.add_field(
+                name='\u200b',
+                value=par,
+                inline=False
+            )
+        await ctx.send(embed=embed)
+        return
     elif args[0].lower() in ['set', 'setgen', 'gen']:
         # set generation default
         if len(args) < 2 or not valid_gen(args[1]):
