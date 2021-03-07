@@ -85,9 +85,9 @@ def pokeCalendar(gen, searchdate):
                 + curSeason
             )
     elif gen == 4 and isJan1(searchdate):
-        pass
+        return "Jan 1: Day of Beginning"
     elif gen == 4 and isDec31(searchdate):
-        pass
+        return "Dec 31: Day of Ending"
 
     # Regular date
     return (
