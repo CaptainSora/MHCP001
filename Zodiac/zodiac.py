@@ -66,14 +66,20 @@ def pokeCalendar(gen, searchdate):
             curSeason = season[0]
             break
 
-
+    # Gen 4 exceptions
+    if gen == 4 and isJan1(searchdate):
+        return "Jan 1: The Day of Beginning"
+    elif gen == 4 and isDec31(searchdate):
+        return "Dec 31: The Day of Ending"
+    
+    # String formatting
     dateString = searchdate.strftime("%b %d").replace(" 0"," ")
     curSeason = (
         curSeason.title().replace(" Of ", " of ").replace(" The ", " the ")
     )
     curReign = curReign.replace("The ", "")
 
-    # Edge case date
+    # Feb 29 exceptions
     if isFeb29(searchdate):
         if gen == 4:
             return "Feb 29: The Day of the Cloning"
@@ -84,10 +90,6 @@ def pokeCalendar(gen, searchdate):
                 "Feb 29: The " + feb29[0][3:-1] + " in the " + curReign + ", "
                 + curSeason
             )
-    elif gen == 4 and isJan1(searchdate):
-        return "Jan 1: The Day of Beginning"
-    elif gen == 4 and isDec31(searchdate):
-        return "Dec 31: The Day of Ending"
 
     # Regular date
     return (
