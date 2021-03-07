@@ -5,7 +5,7 @@ from discord import Embed
 
 from Zodiac.dategen import random_day
 
-
+# Convert String dates to DateTime Ojects
 def convertReignDate(date, refdate):
     dateObject = datetime.strptime("2000 " + date, "%Y %m/%d")
     try:
@@ -17,6 +17,7 @@ def convertSeasonDate(date, refdate):
     dateObject = datetime.strptime(date, "%B %d")
     return dateObject.replace(year=refdate.year)
 
+# Check edge case dates (Boolean functions)
 def isJan1(date):
     return date.month == 1 and date.day == 1
 
@@ -26,6 +27,8 @@ def isFeb29(date):
 def isDec31(date):
     return date.month == 12 and date.day == 31
 
+
+# MAIN
 def pokeCalendar(gen, searchdate):
 
     with open(f"Zodiac/gen{gen}.txt", "r", encoding = "utf-8") as f:
@@ -36,6 +39,7 @@ def pokeCalendar(gen, searchdate):
     seasonlist = []
     feb29 = []
 
+    # Creates four lists and stores info in each list
     for item in megalist:
         if item != "":
             if item[0] == "-":
@@ -51,15 +55,17 @@ def pokeCalendar(gen, searchdate):
             else:
                 feb29.append(item)
 
+    # Find date info
     day_of_year = searchdate.timetuple().tm_yday
     curDate = daylist[day_of_year-1][2:]
 
+    # Find reign info
     for reign in reignlist:
         reignEndDate = convertReignDate(reign[1], searchdate)
         if searchdate <= reignEndDate:
             curReign = reign[0]
             break
-   
+    # Find season info
     for season in seasonlist:
         seasonEndDate = convertSeasonDate(season[1], searchdate)
         if searchdate <= seasonEndDate:
@@ -72,7 +78,7 @@ def pokeCalendar(gen, searchdate):
     elif gen == 4 and isDec31(searchdate):
         return "Dec 31: The Day of Ending"
     
-    # String formatting
+    # String Formatting
     dateString = searchdate.strftime("%b %d").replace(" 0"," ")
     curSeason = (
         curSeason.title().replace(" Of ", " of ").replace(" The ", " the ")
@@ -91,7 +97,7 @@ def pokeCalendar(gen, searchdate):
                 + curSeason
             )
 
-    # Regular date
+    # Return regular dates
     return (
         dateString + ": The " + curDate + " in the " + curReign + ", "
         + curSeason
