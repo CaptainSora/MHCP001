@@ -17,6 +17,8 @@ import Apps.profile
 import DG.dg
 import DG.archery
 import GuardianTales.scarecrow
+import Overcooked2.oc2
+import TheMind.mind
 import Zodiac.zodiac
 from Help.help import help_page
 
@@ -170,12 +172,49 @@ async def waluigi(ctx, *args):
         return
     await ctx.send(' '.join(args).replace('wa', 'WAH').replace('wha', 'WAH'))
 
+@bot.command(name='stars', aliases=['oc2'])
+async def print_stars(ctx, *args):
+    await Overcooked2.oc2.display_stars(ctx, args)
+
+@bot.command(name='update', aliases=['oc2update'])
+async def update_stars(ctx, *args):
+    await Overcooked2.oc2.update_stars(ctx, args)
+
+@bot.command(name='mind')
+async def start_mind(ctx, *args):
+    mind = bot.get_channel(821751349049425951)
+    players = [] # List of User objects
+    dms = [] # List of DMChannel objects
+    hardmode = False
+    for a in args:
+        if a.lower() in ['hard', 'hardmode', 'h']:
+            hardmode = True
+        elif a[:2] == "<@":
+            user = bot.get_user(int(a.lstrip("<@!").rstrip(">")))
+            if user is None:
+                break
+            players.append(user)
+            dm_ch = user.dm_channel
+            if dm_ch is None:
+                dm_ch = await user.create_dm()
+            dms.append(dm_ch)
+    author = ctx.message.author
+    if author not in players:
+        players.insert(0, author)
+        dm_ch = author.dm_channel
+        if dm_ch is None:
+            dm_ch = await author.create_dm()
+        dms.insert(0, dm_ch)
+    await TheMind.mind.game_starter(mind, players, dms, hardmode)
+
 @bot.event
 async def on_message(message):
     archery = bot.get_channel(808155589385125898)
+    mind = bot.get_channel(821751349049425951)
     me = bot.get_user(278589912184258562)
-    botid = bot.get_user(279321031989264384)
-    if message.author == botid:
+    if message.author == bot.user:
+        # Checks for messages sent by itself
+        await confirm(message)
         return
     if message.channel == archery:
         if message.author != me:
@@ -183,10 +222,9 @@ async def on_message(message):
             return
         await DG.archery.dg_archery(archery, message.content)
         return
+    if message.channel == mind and not message.content.startswith('.'):
+        await TheMind.mind.message_handler(message)
     if not dict_ready:
-        return
-    if message.author == bot.user:
-        await confirm(message)
         return
     if message.content.startswith('.'):
         await bot.process_commands(message)  # NECESSARY TO NOT BREAK COMMANDS
