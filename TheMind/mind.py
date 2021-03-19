@@ -52,6 +52,15 @@ class Mind:
         )
         with open('TheMind/instr.txt') as f:
             embed.description = f.read()
+        # Validate number of players
+        if len(self.players) < 2 or len(self.players) > 4:
+            embed.add_field(
+                name='Invalid number of players',
+                value="Must be 2-4 players"
+            )
+            await self.mind.send(embed=embed)
+            return -9
+        # Valid game, start round
         embed.add_field(
             name='Mode',
             value=f'{len(self.players)}p{self.hardstr}'
@@ -62,6 +71,7 @@ class Mind:
         )
         await self.mind.send(embed=embed)
         await self.start()
+        return 0
     
     async def already_started(self):
         embed = self.get_embed()
@@ -190,7 +200,7 @@ class Mind:
                 embed.description = (
                     f"{self.hearts()}{self.hearts(num=1, heart=False)}\n"
                     "Missed card(s):\n"
-                    f"{'  '.join([str(c) for c in skippedcards])}"
+                    f"{'  '.join([str(c) for c in skippedcards])}\n"
                     f"Continue from {playedcard}."
                 )
                 await self.mind.send(embed=embed)
@@ -294,7 +304,9 @@ async def game_starter(mind, players, dms, hardmode):
     global GAME
     if GAME is None:
         GAME = Mind(mind, players, dms, hardmode)
-        await GAME.instructions()
+        response = await GAME.instructions()
+        if response == -9:
+            GAME = None
     else:
         await GAME.already_started()
 
