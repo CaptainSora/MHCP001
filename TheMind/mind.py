@@ -201,9 +201,6 @@ class Mind:
         self.stack.append(playedcard)
         # check for round end
         if not any(self.cards):
-            if len(self.stack) != self.level * len(self.players):
-                print("SOMETHING WRONG")
-                return -9
             # skipped cards (hard mode only)
             if self.hardmode:
                 skips = [
@@ -234,16 +231,25 @@ class Mind:
             if self.level == self.maxlevel:
                 await self.victory()
                 return -9
-            # random extra life
+            # extra life/stars
             if self.level in self.bonus_lives:
                 self.lives += 1
                 embed.description = "Bonus :heart:!"
                 await self.mind.send(embed=embed)
+            if self.level in self.bonus_stars:
+                self.stars += 1
+                pass
             # end round
             self.level += 1
             await self.start()
         return 0
     
+    async def request_stars(self, user):
+        pass
+
+    async def confirm_stars(self, user):
+        pass
+
     async def victory(self):
         embed = self.get_embed()
         embed.description = (
