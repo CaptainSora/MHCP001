@@ -4,6 +4,8 @@ from random import sample, shuffle
 
 from discord import Embed
 
+from TheMind.minddb import insert
+
 # 2p: 12 levels
 # 3p: 10 levels
 # 4p: 8 levels
@@ -351,26 +353,13 @@ class Mind:
         return 0
 
     async def victory(self):
-        # Save data to json
-        with open("TheMind/stats.json", 'r') as f:
-            stats = load(f)
-        teamid = ','.join(sorted([p.id for p in self.players]))
+        # Save data to db
+        players = sorted([p.id for p in self.players])
         mode = "Standard" if not self.hardmode else "Hard"
         gametime = (datetime.now() - self.start_time).seconds
-        timetaken = f"{int(gametime/60)}:{gametime%60:02}"
-        if teamid not in stats:
-            stats[teamid] = {}
-        if mode not in stats[teamid]:
-            stats[teamid][mode] = []
-        gamedata = {
-            "Lives lost": self.lives_lost,
-            "Stars used": self.shurikens_used,
-            "Time taken": timetaken
-        }
-        stats[teamid][mode].append(gamedata)
-        with open("TheMind/stats.json", 'w') as f:
-            dump(stats, f)
+        insert(players, mode, self.lives_lost, self.shurikens_used, gametime)
         # Victory embed
+        timetaken = f"{int(gametime/60)}:{gametime%60:02}"
         embed = self.get_embed()
         embed.description = (
             ":tada: :tada: **VICTORY!** :tada: :tada:\n\n"
