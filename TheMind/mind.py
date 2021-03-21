@@ -1,3 +1,5 @@
+from datetime import datetime
+from json import load, dump
 from random import sample, shuffle
 
 from discord import Embed
@@ -28,10 +30,11 @@ class Mind:
         self.bonus_stars = [2, 5, 8]
         self.asc_blind = [3, 6, 8, 10]
         self.desc_blind = [4, 6, 10, 12]
+        self.start_time = None
         # OTHER
         self.active = False
         self.stack = []
-        self.top_discard = None
+        self.discard = None
         self.mind = mind # the-mind text channel object
         self.lives = len(self.players)
         self.lives_lost = 0
@@ -83,6 +86,7 @@ class Mind:
     async def start(self):
         # reset
         self.active = False
+        self.discard = None
         self.stack = []
         self.ready = [False for _ in self.players]
         # pick cards
@@ -107,7 +111,8 @@ class Mind:
             value=(
                 "Waiting for all players to type 'ready' or 'r'.\n"
                 "Players may type 'pause' or 'p' at any point during the game "
-                "to initiate a resynchronization."
+                "to initiate a resynchronization, or type 'star' or 's' to "
+                "request using a star."
             )
         )
         await self.mind.send(embed=embed)
@@ -126,7 +131,7 @@ class Mind:
         return ' '.join(heartlist)
     
     def stars(self, num=None):
-        staremoji = ":stars:" if num is None else ":comet:"
+        staremoji = ":star:" if num is None else ":star2:"
         if num is None:
             num = self.shurikens
         starlist = [staremoji for _ in range(max(0, num))]
@@ -139,15 +144,18 @@ class Mind:
             color=MINDCOLOR
         )
 
-    async def request_resync(self, user, status=None):
+    async def request_resync(self, user, staruse=None):
         embed = self.get_embed()
         idx = self.get_user_index(user)
-        if idx < 0 or not self.active:
+        if idx < 0 or (not self.active and staruse is None):
+            # Only allow manual triggering when game is active
             return -1
-        if status is None:
+        if staruse is None:
             embed.description = "Resync requested.\n"
-        elif status is False:
+        elif staruse is False:
             embed.description = "Star use declined.\n"
+        else:
+            embed.description = ""
         embed.description += (
             "Waiting for all players to type 'ready' or 'r' to continue."
         )
@@ -159,6 +167,7 @@ class Mind:
             name='Cards remaining:',
             value='\n'.join([
                 ' '.join(["🂠" for _ in range(len(self.cards[i]))])
+                if self.cards[i] else '\u200b'
                 for i in range(len(self.players))
             ])
         )
@@ -175,17 +184,19 @@ class Mind:
             return -1
         self.ready[idx] = True # Add ready status to player
         if all(self.ready): # If final ready message
-            if self.stack:
+            if self.discard:
+                embed.description += f"\nContinue from {self.discard}."
+                self.discard = None
+            elif self.stack:
                 if self.hardmode:
-                    embed.description = "Continue!"
-                elif self.top_discard is not None:
-                    embed.description = f"Continue from {self.top_discard}."
-                    self.top_discard = None
+                    embed.description += "\nContinue!"
                 else:
-                    embed.description = f"Continue from {self.stack[-1]}."
+                    embed.description += f"\nContinue from {self.stack[-1]}."
             else:
-                embed.description += ' **BEGIN!**'
+                embed.description += '\n**BEGIN!**'
             self.active = True
+            if self.start_time is None:
+                self.start_time = datetime.now()
             await self.mind.send(embed=embed)
         return 0
 
@@ -194,8 +205,6 @@ class Mind:
         if idx < 0 or not self.cards[idx] or not self.active:
             # No user, user has no cards, or paused
             return -1
-        # embed
-        embed = self.get_embed()
         # played and skipped cards
         playedcard = self.cards[idx].pop(0)
         skippedcards = []
@@ -213,6 +222,7 @@ class Mind:
             self.stack.extend(skippedcards)
             # lose lives
             if skippedcards:
+                embed = self.get_embed()
                 self.lives -= 1
                 self.lives_lost += 1
                 embed.description = (
@@ -227,53 +237,59 @@ class Mind:
                     return -9
         # add played card to stack
         self.stack.append(playedcard)
-        # check for round end
-        if not any(self.cards):
-            # skipped cards (hard mode only)
-            if self.hardmode:
-                skips = [
-                    self.stack[i] for i in range(len(self.stack) - 1)
-                    if self.stack[i] > min(self.stack[i+1:])
-                    and self.stack[i] > max(self.stack[:i])
-                ]
-                # lose lives
-                prev = self.lives
-                self.lives -= len(skips)
-                self.lives_lost += len(skips)
-                # display cards played
-                cards_played = [
-                    f"{c}" if c not in skips else f"__{c}__"
-                    for c in self.stack
-                ]
-                embed.description = (
-                    f"{self.hearts()} "
-                    f"{self.hearts(num=min(prev, len(skips)))}\n"
-                    "Cards played:\n"
-                    f"{'  '.join(cards_played)}"
-                )
-                await self.mind.send(embed=embed)
-                if self.lives <= 0:
-                    await self.defeat()
-                    return -9
-            # check last level
-            if self.level == self.maxlevel:
-                await self.victory()
+        return await self.round_end()
+    
+    async def round_end(self):
+        # check for round end, returns 1 if round ended
+        if any(self.cards):
+            return 0
+        # embed
+        embed = self.get_embed()
+        # skipped cards (hard mode only)
+        if self.hardmode:
+            skips = [
+                self.stack[i] for i in range(len(self.stack) - 1)
+                if self.stack[i] > min(self.stack[i+1:])
+                and self.stack[i] > max(self.stack[:i])
+            ]
+            # lose lives
+            prev = self.lives
+            self.lives -= len(skips)
+            self.lives_lost += len(skips)
+            # display cards played
+            cards_played = [
+                f"{c}" if c not in skips else f"__{c}__"
+                for c in self.stack
+            ]
+            embed.description = (
+                f"{self.hearts()} "
+                f"{self.hearts(num=min(prev, len(skips)))}\n"
+                "Cards played:\n"
+                f"{'  '.join(cards_played)}"
+            )
+            await self.mind.send(embed=embed)
+            if self.lives <= 0:
+                await self.defeat()
                 return -9
-            # extra life/stars
-            extra = []
-            if self.level in self.bonus_lives:
-                self.lives += 1
-                extra.append(":heart:")
-            if self.level in self.bonus_stars:
-                self.shurikens += 1
-                extra.append(":stars:")
-            if extra:
-                embed.description = f"Bonus {' '.join(extra)}!"
-                await self.mind.send(embed=embed)
-            # end round
-            self.level += 1
-            await self.start()
-        return 0
+        # check last level
+        if self.level == self.maxlevel:
+            await self.victory()
+            return -9
+        # extra life/stars
+        extra = []
+        if self.level in self.bonus_lives:
+            self.lives += 1
+            extra.append(":heart:")
+        if self.level in self.bonus_stars:
+            self.shurikens += 1
+            extra.append(":star:")
+        if extra:
+            embed.description = f"Bonus {' '.join(extra)}!"
+            await self.mind.send(embed=embed)
+        # end round
+        self.level += 1
+        await self.start()
+        return 1
     
     async def request_stars(self, user):
         embed = self.get_embed()
@@ -294,7 +310,7 @@ class Mind:
             "('y' or 'n') to continue."
         )
         self.active = False
-        await self.mind.send(embed)
+        await self.mind.send(embed=embed)
         return 0
 
     async def confirm_stars(self, user, ans):
@@ -303,12 +319,16 @@ class Mind:
             return -1
         if not ans:
             self.use_stars = []
-            await self.request_resync(user, status=False)
+            await self.request_resync(user, staruse=False)
             return 0
         self.use_stars[idx] = True
         if all(self.use_stars):
-            discard = [self.cards[i].pop(0) for i in range(len(self.players))]
-            self.top_discard = max(discard)
+            discard = [
+                self.cards[i].pop(0) if self.cards[i] else 999
+                for i in range(len(self.players))
+            ]
+            self.discard = min(discard)
+            discard = [str(c) if c < 999 else "\u200b" for c in discard]
             self.shurikens -= 1
             self.shurikens_used += 1
             embed = self.get_embed()
@@ -319,16 +339,43 @@ class Mind:
             )
             embed.add_field(
                 name="Discarded:",
-                value='\n'.join([str(c) for c in discard])
+                value='\n'.join(discard)
             )
             await self.mind.send(embed=embed)
+            response = await self.round_end()
+            # check for round end
+            if response == 0:
+                await self.request_resync(user=user, staruse=True)
+            else:
+                return response
         return 0
 
     async def victory(self):
+        # Save data to json
+        with open("TheMind/stats.json", 'r') as f:
+            stats = load(f)
+        teamid = ','.join(sorted([p.id for p in self.players]))
+        mode = "Standard" if not self.hardmode else "Hard"
+        gametime = (datetime.now() - self.start_time).seconds
+        timetaken = f"{int(gametime/60)}:{gametime%60:02}"
+        if teamid not in stats:
+            stats[teamid] = {}
+        if mode not in stats[teamid]:
+            stats[teamid][mode] = []
+        gamedata = {
+            "Lives lost": self.lives_lost,
+            "Stars used": self.shurikens_used,
+            "Time taken": timetaken
+        }
+        stats[teamid][mode].append(gamedata)
+        with open("TheMind/stats.json", 'w') as f:
+            dump(stats, f)
+        # Victory embed
         embed = self.get_embed()
         embed.description = (
             ":tada: :tada: **VICTORY!** :tada: :tada:\n\n"
-            "Congratulations on beating The Mind!\n"
+            "Congratulations on beating *The Mind*!\n"
+            "Game data saved."
         )
         embed.add_field(
             name='Players:',
@@ -339,8 +386,9 @@ class Mind:
             name='Game Stats:',
             value=(
                 f"Mode: {len(self.players)}p{self.hardstr}\n"
-                f"Lives lost: {self.hearts(num=self.lives_lost)}"
-                f"Stars used: {self.stars(num=self.shurikens_used)}"
+                f"Lives lost: {self.hearts(num=self.lives_lost)}\n"
+                f"Stars used: {self.stars(num=self.shurikens_used)}\n"
+                f"Time taken: {timetaken}"
             ),
             inline=False
         )

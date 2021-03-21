@@ -2,17 +2,25 @@ Welcome to *The Mind*.
 
 *The Mind* is more than just a game. It's an experiment, a journey, a team experience in which you can't exchange information, yet will become one to defeat all the levels of the game.
 
-In more detail, the deck contains cards numbered 1-100, and during the game you try to complete 12, 10, or 8 levels of play with 2, 3, or 4 players. In a level, each player receives a hand of cards equal to the number of the level: one card in level 1, two cards in level 2, etc.
+The deck contains cards numbered 1-100, and during the game you try to complete 12, 10, or 8 levels of play with 2, 3, or 4 players. In a level, each player receives cards equal to the number of the level.
 
 Collectively you must play these cards into this channel on a single discard pile in ascending order, __but you cannot communicate with one another in any way as to which cards you hold__.
 
-To begin each round, cards will be dealt to you via DM. Be sure to copy these down, or use another device as reference. __The game will begin when all players type 'ready' or 'r' into this channel.__ All game commands are case-insensitive, in case you are playing on mobile.
+To begin each round, cards will be dealt to you via DM. Be sure to copy these down, or use another device as reference. __The game will begin when all players type 'ready' or 'r' into this channel.__
 
-__**To play a card, type only the number into this channel.**__ You may also type 'pause' or 'p' at any point during the game to resynchronize all players. This will also show you the number of cards each player has. __These are the only ways you may communicate with one another.__ If you enter a number you don't have, or have already played, or type in anything else, your message will be deleted.
+**__Commands (case-insensitive):__**
+'ready' or 'r': start or continue a round
+(the card number): play a card
+'x': play a card (HARD MODE)
+'pause' or 'p': pause to resynchronize
+'star' or 's': suggest using a star
+'yes' or 'y': accept using a star
+'no' or 'n': reject using a star
+'quit' or 'exit': terminate the game
 
-You start the game with a number of lives equal to the number of players. Lose all your lives, and you lose the game. As you complete levels, you might receive a reward of an extra life, if you're lucky. Complete all the levels, and you win!
+__These are the only ways you may communicate with one another.__ If you enter a number which isn't your lowest card, or type in anything not in the list above, your message will be deleted.
 
-At any time, you may enter 'quit' or 'exit' to end the game.
+You start the game with a number of lives equal to the number of players. Lose all your lives, and you lose the game. As you complete levels, you might receive a reward of an extra life or an extra star. Complete all the levels, and you win!
 
 In HARD MODE, all cards are played face down. __**You must type 'x' instead of your card number. The lowest card you have will be played.**__
 

@@ -207,6 +207,19 @@ async def start_mind(ctx, *args):
         dms.insert(0, dm_ch)
     await TheMind.mind.game_starter(mind, players, dms, hardmode)
 
+# @bot.command(name='test')
+# async def test(ctx, *args):
+#     messageids = [
+#         (822244656786964530, 822249556975681536),
+#         (822567574843686955, 822571695340519455),
+#         (823312818794135552, 823317281215348736)
+#     ]
+#     for m in messageids:
+#         m0 = await ctx.fetch_message(m[0])
+#         m1 = await ctx.fetch_message(m[1])
+#         gametime = (m1.created_at - m0.created_at).seconds
+#         print(f"{int(gametime/60)}:{gametime%60:02}")
+
 @bot.event
 async def on_message(message):
     archery = bot.get_channel(808155589385125898)
