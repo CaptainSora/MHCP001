@@ -6,6 +6,7 @@ from random import choice
 from discord import Activity, ActivityType, Client, Embed, File, Status
 from discord.ext import commands
 from discord.utils import get
+# from discord_slash import SlashCommand
 from dotenv import load_dotenv
 
 import Apps.bank
@@ -17,6 +18,7 @@ import Apps.profile
 import DG.dg
 import DG.archery
 import GuardianTales.scarecrow
+import MovingOut.moo
 import Overcooked2.oc2
 import TheMind.mind
 import Zodiac.zodiac
@@ -27,6 +29,8 @@ API_ACCESS = getenv('API_ACCESS')
 
 bot = commands.Bot(command_prefix='.')
 bot.remove_command('help')
+# client = Client()
+# slash = SlashCommand(client, sync_commands=True)
 
 dict_ready = False
 
@@ -176,9 +180,23 @@ async def waluigi(ctx, *args):
 async def print_stars(ctx, *args):
     await Overcooked2.oc2.display_stars(ctx, args)
 
-@bot.command(name='update', aliases=['oc2update'])
+@bot.command(name='oc2update')
 async def update_stars(ctx, *args):
     await Overcooked2.oc2.update_stars(ctx, args)
+
+@bot.command(name='seasonal')
+async def seasonal_help_text(ctx, *args):
+    helptext = (
+        "```\n"
+        "12 o'clock: Chinese New Year\n"
+        " 2 o'clock: Kevin's Christmas Cracker\n"
+        " 4 o'clock: Winter Wonderland\n"
+        " 6 o'clock: Sun's Out, Buns Out\n"
+        " 8 o'clock: Moon Harvest\n"
+        "10 o'clock: Spring Festival\n"
+        "```"
+    )
+    await ctx.send(helptext)
 
 @bot.command(name='mind')
 async def start_mind(ctx, *args):
@@ -206,6 +224,19 @@ async def start_mind(ctx, *args):
             dm_ch = await author.create_dm()
         dms.insert(0, dm_ch)
     await TheMind.mind.game_starter(mind, players, dms, hardmode)
+
+@bot.command(name='moo')
+async def moving_out_completion(ctx, *args):
+    await MovingOut.moo.display_completion(ctx)
+
+@bot.command(name='mooupdate')
+async def moving_out_update(ctx, *args):
+    await MovingOut.moo.update_completion(ctx, args)
+
+# guild_ids = [454130181427167232]
+# @slash.slash(name="ping", guild_ids=guild_ids)
+# async def test_ping(ctx):
+#     await ctx.send(f"Pong! ({bot.latency*1000}ms)")
 
 # @bot.command(name='test')
 # async def test(ctx, *args):

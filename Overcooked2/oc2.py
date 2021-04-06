@@ -3,6 +3,11 @@ from json import dump, load
 
 from discord import Embed
 
+def cur_max_stars(starlist):
+    return (
+        sum([3 * i if isinstance(i, bool) else i for i in starlist]),
+        sum([3 if isinstance(i, bool) else 4 for i in starlist])
+    )
 
 def stars_counter(stardict):
     """
@@ -20,18 +25,18 @@ def stars_counter(stardict):
             ])
     else:
         # stardict is lowest level
-        if "World" in stardict:
-            for i in range(len(stardict['World'])):
-                world = stardict['World'][i]
-                starcount.append([f"World {i+1}", sum(world), 4 * len(world)])
-        if "Kevin" in stardict:
-            kevin = stardict['Kevin']
-            starcount.append(["Kevin", sum(kevin), 4 * len(kevin)])
-        if "Tutorial" in stardict:
-            starcount.append(["Tutorial", stardict['Tutorial'], 4])
-        if "Horde" in stardict:
-            horde = stardict['Horde']
-            starcount.append(["Horde", 3 * sum(horde), 3 * len(horde)])
+        for zone in stardict:
+            # Three possible depths for lowest level dict
+            # int, [int, ...], [[int, ...], ...]
+            if isinstance(stardict[zone], int):
+                starcount.append([zone, stardict[zone], 4])
+            elif isinstance(stardict[zone][0], int):
+                c, m = cur_max_stars(stardict[zone])
+                starcount.append([zone, c, m])
+            else:
+                for i in range(len(stardict[zone])):
+                    c, m = cur_max_stars(stardict[zone][i])
+                    starcount.append([f"{zone} {i+1}", c, m])
     return starcount
 
 def stars_wrapper(path):
