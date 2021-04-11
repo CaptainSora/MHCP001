@@ -184,6 +184,10 @@ async def print_stars(ctx, *args):
 async def update_stars(ctx, *args):
     await Overcooked2.oc2.update_stars(ctx, args)
 
+@bot.command(name='oc2rankings', aliases=['rankings'])
+async def oc2_rankings(ctx, *args):
+    await Overcooked2.oc2.dump_rankings(ctx, args)
+
 @bot.command(name='seasonal')
 async def seasonal_help_text(ctx, *args):
     helptext = (

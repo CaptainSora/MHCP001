@@ -20,11 +20,11 @@ TRANSLATION = {
 
 TEAM = "[Blank]"
 
-def scrape_greeny():
+def scrape_greeny(override=False):
     scrapedate = str(date.today())
     with open('Overcooked2/greeny2p.json', 'r') as f:
         greeny2p = load(f)
-    if greeny2p['last-updated'] == scrapedate:
+    if greeny2p['last-updated'] == scrapedate and not override:
         return
     greeny2p['last-updated'] = scrapedate
     # Begin scraping
@@ -50,7 +50,16 @@ def scrape_greeny():
         dump(greeny2p, f)
     print("Finished scraping!")
 
-def dump_rankings():
+def time_lt(t1, t2):
+    # expects mm:ss as duration
+    # returns t1 < t2
+    t1 = [int(t) for t in t1.split(':')]
+    t2 = [int(t) for t in t2.split(':')]
+    return t1[0] < t2[0] or (t1[0] == t2[0] and t1[1] < t2[1])
+
+def get_rankings(override=False):
+    # Refresh data
+    scrape_greeny(override)
     # Load data
     with open('Overcooked2/greeny2p.json', 'r') as f:
         greeny2p = load(f)
@@ -70,9 +79,6 @@ def dump_rankings():
             scores = scores[path]
         # Iterate over levels
         for level in greeny2p[world]:
-            # Score on leaderboards already
-            if TEAM in greeny2p[world][level]:
-                pass
             # Parallel access 2nd dictionary for high scores
             levelpath = level.split('-')
             levelscore = scores
@@ -80,5 +86,28 @@ def dump_rankings():
                 levelscore = levelscore['World']
             for path in levelpath:
                 if path.isdecimal():
-                    scores = scores[int(path)-1]
+                    levelscore = levelscore[int(path)-1]
+                else:
+                    levelscore = levelscore[path.title()]
+            if isinstance(levelscore, list):
+                levelscore = levelscore[0]
             # levelscore should be base type now (int, with 6-6 str)
+            place = 1
+            on_lb = TEAM in greeny2p[world][level]
+            mismatch = on_lb and levelscore != greeny2p[world][level][TEAM]
+            # Iterate over leaderboard
+            for team, score in greeny2p[world][level].items():
+                # compare scores
+                if world == 'story' and level == '6-6':
+                    if time_lt(score, levelscore):
+                        break
+                elif score < levelscore:
+                    break
+                # check for own team
+                if team == TEAM:
+                    break
+                # increment
+                place += 1
+            values.append([level, place, on_lb, mismatch])
+        rankings[header] = values
+    return rankings

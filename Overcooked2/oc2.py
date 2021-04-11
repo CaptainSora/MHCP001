@@ -3,6 +3,8 @@ from json import dump, load
 
 from discord import Embed
 
+from Overcooked2.greeny import get_rankings
+
 def cur_max_stars(starlist):
     return (
         sum([3 * i if isinstance(i, bool) else i for i in starlist]),
@@ -192,3 +194,93 @@ async def update_stars(ctx, args):
             f"Failed to update {path_text}."
         )
         await ctx.send(embed=embed)
+
+def th(num):
+    # Assumes num >= 1
+    if num == 1:
+        return ":first_place: 1st"
+    elif num == 2:
+        return ":second_place: 2nd"
+    elif num == 3:
+        return ":third_place: 3rd"
+    else:
+        emote = ""
+        if num <= 5:
+            emote = ":cherry_blossom: "
+        elif num <= 7:
+            emote = ":snowflake: "
+        elif num <= 10:
+            emote = ":reminder_ribbon: "
+        return f"{emote}{num}th"
+
+def pts(rank):
+    # Assumes rank >= 1
+    lb_scores = [15, 10, 5, 3, 3, 2, 2, 1, 1, 1]
+    if rank > 10:
+        return 0
+    else:
+        return lb_scores[rank - 1]
+
+async def dump_rankings(ctx, args):
+    embed = Embed(
+        title='Overcooked 2 Rankings',
+        color=0x63abeb
+    )
+    lbpoints = 0
+    totalpoints = 0
+    t10 = [0 for _ in range(10)]
+    s10 = [0 for _ in range(10)]
+    # Manual search override
+    override = False
+    if len(args) > 0 and args[1].lower() in ['override', 'o']:
+        override = True
+    async with ctx.typing():
+        rankings = get_rankings(override)
+    for header, body in rankings.items():
+        embed.description = header
+        for level in body:
+            embed.add_field(
+                name=level[0],
+                value=(
+                    f"{th(level[1])} {level[2] * ':clapper:'} "
+                    f"{level[3] * ':arrows_counterclockwise:'}"
+                )
+            )
+            totalpoints += pts(level[1])
+            lbpoints += level[2] * pts(level[1])
+            if level[1] <= 10:
+                t10[level[1] - 1] += 1
+                if level[2]:
+                    s10[level[1] - 1] += 1
+            if len(embed.fields) >= 24:
+                await ctx.send(embed=embed)
+                embed.clear_fields()
+        if len(embed.fields) > 0:
+            await ctx.send(embed=embed)
+            embed.clear_fields()
+    embed.description = "Summary"
+    embed.add_field(
+        name="Leaderboard points:",
+        value=f"{lbpoints} over {sum(s10)} levels",
+        inline=False
+    )
+    embed.add_field(
+        name="Total potential points:",
+        value=f"{totalpoints} over {sum(t10)} levels",
+        inline=False
+    )
+    embed.add_field(
+        name="Ranks:",
+        value='\n'.join([th(i+1) for i in range(10)])
+    )
+    embed.add_field(
+        name="Frequency:",
+        value='\n'.join([str(n) for n in t10])
+    )
+    embed.add_field(
+        name="Submitted:",
+        value='\n'.join([str(n) for n in s10])
+    )
+    await ctx.send(embed=embed)
+
+# update highscores
