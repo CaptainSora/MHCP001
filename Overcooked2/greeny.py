@@ -57,6 +57,16 @@ def time_lt(t1, t2):
     t2 = [int(t) for t in t2.split(':')]
     return t1[0] < t2[0] or (t1[0] == t2[0] and t1[1] < t2[1])
 
+def time_int_sub(t1, t2):
+    # Calculates t1 - t2
+    if isinstance(t1, int):
+        return t1 - t2
+    else:
+        t1 = [int(t) for t in t1.split(':')]
+        t2 = [int(t) for t in t2.split(':')]
+        diff_s = (60 * t1[0] + t1[1]) - (60 * t2[0] + t2[1])
+        return f"{diff_s//60:02}:{diff_s%60:02}"
+
 def get_rankings(override=False):
     # Refresh data
     scrape_greeny(override)
@@ -96,18 +106,31 @@ def get_rankings(override=False):
             on_lb = TEAM in greeny2p[world][level]
             mismatch = on_lb and levelscore != greeny2p[world][level][TEAM]
             # Iterate over leaderboard
+            first_score = None
+            next_score = levelscore
             for team, score in greeny2p[world][level].items():
-                # compare scores
+                # Get first score
+                if first_score is None:
+                    first_score = score
+                # compare scores for story 6-6
                 if world == 'story' and level == '6-6':
                     if time_lt(score, levelscore):
                         break
+                # compare scores for all other levels
                 elif score < levelscore:
                     break
                 # check for own team
                 if team == TEAM:
                     break
-                # increment
+                # increment and update next score
                 place += 1
-            values.append([level, place, on_lb, mismatch])
+                if score != levelscore:
+                    next_score = score
+            values.append([
+                level, place, on_lb, mismatch,
+                time_int_sub(first_score, levelscore),
+                time_int_sub(next_score, levelscore),
+                levelscore
+            ])
         rankings[header] = values
     return rankings

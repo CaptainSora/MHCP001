@@ -168,7 +168,7 @@ async def echo(ctx, *args):
     await ctx.message.delete()
     me = bot.get_user(278589912184258562)
     if ctx.message.author == me:
-        await ctx.send(' '.join(args))
+        await ctx.send(' '.join(args).strip('`'))
 
 @bot.command(name='waluigi', aliases=['wah', 'w'])
 async def waluigi(ctx, *args):
@@ -176,15 +176,15 @@ async def waluigi(ctx, *args):
         return
     await ctx.send(' '.join(args).replace('wa', 'WAH').replace('wha', 'WAH'))
 
-@bot.command(name='stars', aliases=['oc2'])
+@bot.command(name='oc2stars', aliases=['oc2s'])
 async def print_stars(ctx, *args):
     await Overcooked2.oc2.display_stars(ctx, args)
 
-@bot.command(name='oc2update')
+@bot.command(name='oc2update', aliases=['oc2u'])
 async def update_stars(ctx, *args):
     await Overcooked2.oc2.update_stars(ctx, args)
 
-@bot.command(name='oc2rankings', aliases=['rankings'])
+@bot.command(name='oc2rankings', aliases=['oc2r', 'rankings', 'ranking'])
 async def oc2_rankings(ctx, *args):
     await Overcooked2.oc2.dump_rankings(ctx, args)
 

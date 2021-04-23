@@ -118,6 +118,7 @@ def pathfinder(args):
     path.extend(numinput)
     return path
 
+# Change stars
 def update(value, path):
     with open('Overcooked2/stars.json', 'r') as f:
         stars = load(f)
@@ -142,6 +143,31 @@ def update(value, path):
         dump(stars, f)
         return True
 
+# Change high score
+def highscore(value, path):
+    with open('Overcooked2/highscores.json', 'r') as f:
+        stars = load(f)
+    obj = stars
+    for p in path:
+        obj = obj[p]
+    if not isinstance(obj, (int, str)):
+        return False
+
+    if len(path) == 2:
+        stars[path[0]][path[1]] = value
+    elif len(path) == 3:
+        stars[path[0]][path[1]][path[2]] = value
+    elif len(path) == 4:
+        stars[path[0]][path[1]][path[2]][path[3]] = value
+    elif len(path) == 5:
+        stars[path[0]][path[1]][path[2]][path[3]][path[4]] = value
+    else:
+        return False
+    
+    with open('Overcooked2/highscores.json', 'w') as f:
+        dump(stars, f)
+        return True
+
 def pathtext(path):
     text = ""
     for p in path:
@@ -157,6 +183,7 @@ def pathtext(path):
             text += ': ' + p
     return text
 
+# Wrapper for updating both stars and high score
 async def update_stars(ctx, args):
     embed = Embed(
         title='Overcooked 2 Update',
@@ -168,11 +195,18 @@ async def update_stars(ctx, args):
         )
         await ctx.send(embed=embed)
         return
-    if args[0].isdecimal() and 1 <= int(args[0]) and int(args[0]) <= 4:
+    # Separate updating pb and stars
+    pb = False
+    if ':' in args[0]:
+        pb = True
+        update_value = args[0].strip()
+    elif args[0].isdecimal() and 1 <= int(args[0]):
         update_value = int(args[0])
-    elif args[0].lower() in ['t', 'true', '100']:
+        if update_value > 4:
+            pb = True
+    elif args[0].lower() in ['t', 'true']:
         update_value = True
-    elif args[0].lower() in ['f', 'false', '0']:
+    elif args[0].lower() in ['f', 'false']:
         update_value = False
     else:
         embed.description = "Unknown value."
@@ -181,10 +215,20 @@ async def update_stars(ctx, args):
     
     search_path = pathfinder(args[1:])
     path_text = pathtext(search_path)
-    if update(update_value, search_path):
+
+    if pb and highscore(update_value, search_path):
         embed.colour = 0x00bd5b
         embed.description = (
-            f"Successfully updated {path_text} to {update_value}."
+            f"Successfully updated {path_text} (highscore) to {update_value}."
+        )
+        await ctx.send(embed=embed)
+        # await display_stars(ctx, args[1:])
+    elif not pb and update(update_value, search_path):
+        embed.colour = 0x00bd5b
+        if isinstance(update_value, int):
+            update_value = f"{update_value}"
+        embed.description = (
+            f"Successfully updated {path_text} (completion) to {update_value}."
         )
         await ctx.send(embed=embed)
         await display_stars(ctx, args[1:])
@@ -195,14 +239,14 @@ async def update_stars(ctx, args):
         )
         await ctx.send(embed=embed)
 
-def th(num):
+def th(num, emph=False):
     # Assumes num >= 1
     if num == 1:
-        return ":first_place: 1st"
+        return f":first_place: {emph * '__**'}1st{emph * '**__'}"
     elif num == 2:
-        return ":second_place: 2nd"
+        return f":second_place: {emph * '__'}2nd{emph * '__'}"
     elif num == 3:
-        return ":third_place: 3rd"
+        return f":third_place: {emph * '__'}3rd{emph * '__'}"
     else:
         emote = ""
         if num <= 5:
@@ -230,34 +274,67 @@ async def dump_rankings(ctx, args):
     totalpoints = 0
     t10 = [0 for _ in range(10)]
     s10 = [0 for _ in range(10)]
-    # Manual search override
+    # flags
+    if 'help' in args or '-h' in args:
+        embed.description = (
+            "Command: .oc2r\n"
+            "Flags:\n"
+            "-h Help (this page)\n"
+            "-o Override (request greeny db scrape)\n"
+            "-v Verbose (includes PB data)"
+        )
+        await ctx.send(embed=embed)
+        return
     override = False
-    if len(args) > 0 and args[1].lower() in ['override', 'o']:
+    verbose = False
+    if '-o' in args:
         override = True
+    if '-v' in args:
+        verbose = True
+    # search
     async with ctx.typing():
         rankings = get_rankings(override)
+    num_fields = 0
     for header, body in rankings.items():
         embed.description = header
+        embed.description += (
+            "\n-----------------------------------------------------"
+        )
         for level in body:
-            embed.add_field(
-                name=level[0],
-                value=(
-                    f"{th(level[1])} {level[2] * ':clapper:'} "
-                    f"{level[3] * ':arrows_counterclockwise:'}"
-                )
+            # [
+            #     level, place, on_lb, mismatch,
+            #     time_int_sub(first_score, levelscore),
+            #     time_int_sub(next_score, levelscore),
+            #     levelscore
+            # ]
+            num_fields += 1
+            field_value = (
+                f"{th(level[1], emph=True)} {level[2] * ':clapper:'} "
+                f"{level[3] * ':arrows_counterclockwise:'}"
             )
+            if verbose:
+                field_value += (
+                    f"\nPB: {level[6]}"
+                    f"\nTo next: {level[5]}"
+                    f"\nTo 1st: {level[4]}"
+                )
+            embed.add_field(name=level[0], value=field_value)
             totalpoints += pts(level[1])
             lbpoints += level[2] * pts(level[1])
+            # Add counters
             if level[1] <= 10:
                 t10[level[1] - 1] += 1
                 if level[2]:
                     s10[level[1] - 1] += 1
-            if len(embed.fields) >= 24:
+            # Check for embed length
+            if num_fields >= 24:
                 await ctx.send(embed=embed)
                 embed.clear_fields()
-        if len(embed.fields) > 0:
+                num_fields = 0
+        if num_fields > 0:
             await ctx.send(embed=embed)
             embed.clear_fields()
+            num_fields = 0
     embed.description = "Summary"
     embed.add_field(
         name="Leaderboard points:",
@@ -274,7 +351,7 @@ async def dump_rankings(ctx, args):
         value='\n'.join([th(i+1) for i in range(10)])
     )
     embed.add_field(
-        name="Frequency:",
+        name="Theoretical:",
         value='\n'.join([str(n) for n in t10])
     )
     embed.add_field(
