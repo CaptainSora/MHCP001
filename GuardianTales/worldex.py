@@ -10,14 +10,17 @@ REWARDS = [
     [0, 0, 0, 6, 0, 0, 0, 12,  5,  3],
     [0, 0, 0, 0, 6, 0, 0,  3,  5, 12],
     [0, 0, 6, 0, 0, 0, 0, 12,  8,  0],
-    [0, 0, 0, 6, 0, 0, 0,  8,  0, 12],
+    [0, 0, 0, 6, 0, 0, 0,  8,  0, 12], # 7
     [6, 0, 0, 0, 0, 0, 0,  8, 12,  0],
     [0, 0, 6, 0, 0, 0, 0,  3, 12,  5],
     [0, 0, 0, 0, 6, 0, 0, 12,  0,  8],
     [0, 0, 0, 0, 0, 6, 0,  5, 12,  3],
     [0, 6, 0, 0, 0, 0, 0,  5,  3, 12],
     [6, 0, 0, 0, 0, 0, 0,  9, 13,  0],
-    [0, 0, 6, 0, 0, 0, 0,  3, 13,  6]
+    [0, 0, 6, 0, 0, 0, 0,  3, 13,  6], # 14
+    [0, 6, 0, 0, 0, 0, 0,  6,  3, 13],
+    [0, 0, 0, 0, 0, 6, 0,  6, 13,  3],
+    [0, 0, 0, 0, 6, 0, 0, 13,  0,  9]
 ]
 BONUSES = [
     [6, 0, 0, 0, 0, 0, 0, 0, 2, 0],
@@ -26,14 +29,17 @@ BONUSES = [
     [0, 0, 0, 6, 0, 0, 0, 0, 0, 2],
     [0, 0, 0, 0, 6, 0, 0, 2, 0, 0],
     [0, 0, 6, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 6, 0, 0, 0, 0, 2, 0],
+    [0, 0, 0, 6, 0, 0, 0, 0, 2, 0], # 7
     [6, 0, 0, 0, 0, 0, 0, 0, 0, 2],
     [0, 0, 6, 0, 0, 0, 0, 2, 0, 0],
     [0, 0, 0, 0, 6, 0, 0, 0, 2, 0],
     [0, 0, 0, 0, 0, 6, 0, 0, 0, 2],
     [0, 6, 0, 0, 0, 0, 0, 2, 0, 0],
     [6, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 6, 0, 0, 0, 0, 2, 0, 0],
+    [0, 0, 6, 0, 0, 0, 0, 2, 0, 0], # 14
+    [0, 6, 0, 0, 0, 0, 0, 0, 2, 0],
+    [0, 0, 0, 0, 0, 6, 0, 0, 0, 2],
+    [0, 0, 0, 0, 6, 0, 0, 0, 2, 0]
 ]
 STAGE_NAMES = [
     "The fellowship of the disc",
@@ -42,15 +48,17 @@ STAGE_NAMES = [
     "How to guard treasure",
     "Command center",
     "If you can't enjoy it dodge it",
-    "Three-way split",
+    "Three-way split", # 7
     "Dangerous fishing",
     "No witness no problem",
     "Being a leader",
     "Training day",
     "Sabotage",
     "Mission impossible",
-    "One way street",
-    "Elfheim"
+    "One way street", # 14
+    "Elfheim",
+    "The great escape",
+    "Arms race"
 ]
 # [Flat, Round, Thick, Implantable, Small, Thin, Blank]
 COSTS = [
@@ -148,7 +156,7 @@ def plan(inventory, depth=3, start_day=-1, max_stage=1):
         for inven, hist in branches.items():
             for s in range(max(max_stage, max(hist + [-1]) + 2)):
                 # don't bother testing unboosted
-                if cur_day < 6 and (s + cur_day) % 2 == 1:
+                if cur_day < 5 and (s + cur_day) % 2 == 1:
                     continue
                 first_clear = (s + 1 >= max_stage) and (s > max(hist + [-1]))
                 new_inven = stage_rewards(inven, s, first_clear=first_clear)
@@ -184,5 +192,5 @@ def plan(inventory, depth=3, start_day=-1, max_stage=1):
 
 
 # [Flat, Round, Thick, Implantable, Small, Thin, Blank, Clay, Circuit, Dye]
-# plan([6, 0, 0, 0, 0, 6, 6, 7, 0, 41], depth=7, start_day=4, max_stage=10)
-plan([0, 0, 0, 0, 0, 0, 0, 10, 3, 2], depth=7, start_day=5, max_stage=12)
+# plan([0, 12, 0, 0, 0, 0, 0, 0, 1, 41], depth=7, start_day=5, max_stage=10)
+plan([0, 0, 0, 0, 0, 0, 0, 10, 1, 20], depth=7, start_day=6, max_stage=12)

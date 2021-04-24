@@ -6,11 +6,18 @@ from random import choice
 from discord import Activity, ActivityType, Client, Embed, File, Status
 from discord.ext import commands
 from discord.utils import get
+# from discord_slash import SlashCommand
 from dotenv import load_dotenv
 
+import Apps.bank
 import Apps.dl_emotes
+import Apps.roulette
+import Apps.stocks
+import Apps.untouchable
 import Apps.profile
+import DG.dg
 import DG.archery
+import GuardianTales.scarecrow
 import MovingOut.moo
 import Overcooked2.oc2
 import TheMind.mind
@@ -22,6 +29,8 @@ API_ACCESS = getenv('API_ACCESS')
 
 bot = commands.Bot(command_prefix='.')
 bot.remove_command('help')
+# client = Client()
+# slash = SlashCommand(client, sync_commands=True)
 
 dict_ready = False
 
@@ -51,6 +60,31 @@ async def on_ready():
 async def help(ctx):
     await help_page(ctx, "bot")
 
+# @bot.command(name='poke')
+# async def poke(ctx):
+#     phrases = [
+#         "Hey! No fair!",
+#         "No more poking. Hmpf.",
+#         "What's up?",
+#         "You called?",
+#         "\\*yawns\\*"
+#     ]
+#     await ctx.send(choice(phrases))
+
+# @bot.command(name='taco')
+# async def taco(ctx):
+#     phrases = [
+#         "Om nom nom...",
+#         "Mmm, tacos...",
+#         "Spicy!!",
+#         "Ish sho good!"
+#     ]
+#     await ctx.send(choice(phrases))
+
+# @bot.command(name='emote')
+# async def emote(ctx):
+#     await ctx.send(choice(bot.emojis))
+
 @bot.command(name='emotes')
 async def emotes(ctx):
     await ctx.send('\n'.join(sorted(list(emote_dict.keys()))))
@@ -75,9 +109,29 @@ async def reacts(ctx):
 async def utc_time_wrapper(ctx, *args):
     await Apps.bank.utc_time(ctx)
 
+@bot.command(name='bank', aliases=['b'])
+async def bank_wrapper(ctx, *args):
+   await Apps.bank.bank(ctx, args)
+
+@bot.command(name='untouchable', aliases=['u'])
+async def untouchable_wrapper(ctx, *args):
+    await Apps.untouchable.untouchable(ctx, bot.emojis, args)
+
+@bot.command(name='stocks', aliases=['s'])
+async def stocks_wrapper(ctx, *args):
+    await Apps.stocks.stocks(ctx, bot.emojis, args)
+
+@bot.command(name='roulette', aliases=['r'])
+async def roulette_wrapper(ctx, *args):
+    await Apps.roulette.roulette(ctx, args)
+
 @bot.command(name='profile', aliases=['p'])
 async def profile_wrapper(ctx, *args):
     await Apps.profile.profile(ctx, args)
+
+@bot.command(name='dg')
+async def dg_wrapper(ctx, *args):
+    await DG.dg.dg(ctx, args)
 
 @bot.command(name='badges')
 async def badge_wrapper(ctx, *args):
@@ -96,6 +150,10 @@ async def logout(ctx):
     await bot.change_presence(activity=None, status=Status('offline'))
     await ctx.send("Logging off. Goodnight!")
     await bot.logout()
+
+@bot.command(name='scarcrow', aliases=['sc'])
+async def sc(ctx):
+    await GuardianTales.scarecrow.sc_totals(ctx)
 
 @bot.command(name='roster')
 async def roster(ctx):
@@ -178,6 +236,24 @@ async def moving_out_completion(ctx, *args):
 @bot.command(name='mooupdate')
 async def moving_out_update(ctx, *args):
     await MovingOut.moo.update_completion(ctx, args)
+
+# guild_ids = [454130181427167232]
+# @slash.slash(name="ping", guild_ids=guild_ids)
+# async def test_ping(ctx):
+#     await ctx.send(f"Pong! ({bot.latency*1000}ms)")
+
+# @bot.command(name='test')
+# async def test(ctx, *args):
+#     messageids = [
+#         (822244656786964530, 822249556975681536),
+#         (822567574843686955, 822571695340519455),
+#         (823312818794135552, 823317281215348736)
+#     ]
+#     for m in messageids:
+#         m0 = await ctx.fetch_message(m[0])
+#         m1 = await ctx.fetch_message(m[1])
+#         gametime = (m1.created_at - m0.created_at).seconds
+#         print(f"{int(gametime/60)}:{gametime%60:02}")
 
 @bot.event
 async def on_message(message):

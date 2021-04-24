@@ -113,7 +113,9 @@ def menu_dist(recipes, depth, start=None, aggr=None):
 # start: where to begin probability calculations (tuple of int)
 # aggr: types of menus to group together (list of (tuple of int))
 
-menu_dist(5, 10, aggr=[(3, 2, 'x', 'x', 'x'), (2, 3, 'x', 'x', 'x')])
+menu_dist(3, 17)
+menu_dist(3, 18)
+menu_dist(3, 19)
 
 
 def seq_matches_target(target, seq):
@@ -130,7 +132,7 @@ def seq_matches_target(target, seq):
     return status
 
 def target_menu_probability(recipes, served, visible, target,
-        start=None, exact=False, detailed=False):
+        final_orders=1, start=None, exact=False, detailed=False):
     """
     Calculates the total probability of getting a favourable menu, taking into
     account the last order being later in the sequence.
@@ -143,12 +145,14 @@ def target_menu_probability(recipes, served, visible, target,
     else:
         recipes = [str(r) for r in recipes]
     # Find all menu sequences up to the second-last order
-    seq_pred = sequence_prediction(recipes, served - 1, start)
+    depth = served - final_orders
+    seq_pred = sequence_prediction(recipes, depth, start)
     for dist, prob in seq_pred.items():
         # Find all menu sequences from the second last order given the number
         #   of orders visible
         view_pred = sequence_prediction(recipes, visible, dist)
         diff = seq_matches_target(target, dist)
+        pos_diff = [max(d, 0) for d in diff]
         # Check status of dist
         if all([d == 0 for d in diff]) or (not exact and max(diff) <= 0):
             # dist satisfies target
@@ -157,17 +161,15 @@ def target_menu_probability(recipes, served, visible, target,
         elif exact and min(diff) < 0:
             # Overshot target, exact required
             continue
-        elif max(diff) >= 2 or len([d for d in diff if d > 0]) > 1:
+        elif sum(pos_diff) > final_orders:
             # Missing too many orders
             continue
-        # index holds the location of the one missing order
-        index = diff.index(1)
         # filter and sort
         view_pred = {
             k: v for k, v in sorted(
                 view_pred.items(), key=lambda item: item[1], reverse=True)
-            if k[index] > dist[index] and not \
-                (exact and min(seq_matches_target(target, k)) < 0)
+            if all([k[i] >= dist[i] + pos_diff[i] for i in range(len(k))]) \
+                and not (exact and min(seq_matches_target(target, k)) < 0)
         }
         # No possibilities
         if not view_pred:
@@ -186,11 +188,12 @@ def target_menu_probability(recipes, served, visible, target,
         print(f"Starting from {start}")
     print(f"Targeting {served} total orders served (excl. static)")
     print(f"    Final menu: {target_str}")
+    print(f"    Final orders: {final_orders}")
     print(f"Searching until {visible} total orders visible on screen")
-    print(f"    ({visible - served + 1} orders visible at the end)")
+    print(f"    ({visible - served + final_orders} orders visible at the end)")
     print(f"\n=== Total probability: {100 * total_prob:.2f}% ===\n")
     print(f"Probability breakdown:")
-    print(f"(Menu before last order): (Total probability of target menu)")
+    print(f"(Menu at {depth} orders): (Total probability of target menu)")
     if detailed:
         print(f"    (Total visible orders): (Relative probability)")
     prob_list = []
@@ -205,8 +208,8 @@ def target_menu_probability(recipes, served, visible, target,
 ### SAMPLE USAGE:
 # target_menu_probability(5, 7, 9, (2, 2, 'x', 'x', 'x'))
 # target_menu_probability(
-#     5, 7, 9, (2, 2, 'x', 'x', 'x'), start=(1, 1, 0, 0, 0),
-#     exact=False, detailed=True
+#     5, 7, 9, (2, 2, 'x', 'x', 'x'), final_orders=1,
+#     start=(1, 1, 0, 0, 0), exact=False, detailed=True
 # )
 ### Arguments:
 # -- REQUIRED --
@@ -215,6 +218,7 @@ def target_menu_probability(recipes, served, visible, target,
 # visible: total number of orders visible during the level
 # target: target menu (tuple of int); use 'x' for any you don't care about
 # -- OPTIONAL --
+# final_orders: how many orders you're serving last second/guessing at the end
 # start: start state (tuple of int) if you want to start probability
 #        calculations from partway into a stage
 # exact: whether you want the target numbers to reject going over
@@ -223,6 +227,13 @@ def target_menu_probability(recipes, served, visible, target,
 # detailed: if you want detailed breakdown of each possibility
 
 target_menu_probability(
-    5, 7, 10, (2, 2, 'x', 'x', 'x'), start=(0, 0, 0, 0, 0),
-    exact=True, detailed=False
+    3, 21, 22, (8, 8, 'x'), final_orders=2, start=(0, 0, 0),
+    exact=False, detailed=True
 )
+
+
+# Next targets:
+# Write a function which gives probabilities for exact lengths
+# - f((7, 7, 5), 3) and outputs (CAB: x, CBA: y, ...)
+# Write a function which takes into account scoring and limiting action
+# - f([('C', 40, 1), ('P', 40, 1), ('CP', 60, 2)], 3, 24) outputs 1396
