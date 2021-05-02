@@ -3,7 +3,7 @@ from json import load
 from os import getenv
 from random import choice
 
-from discord import Activity, ActivityType, Client, Embed, File, Status
+from discord import Activity, ActivityType, Embed, File, Status
 from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
@@ -13,6 +13,7 @@ import Apps.profile
 import DG.archery
 import MovingOut.moo
 import Overcooked2.oc2
+import SpellingBee.bee
 import TheMind.mind
 import Zodiac.zodiac
 from Help.help import help_page
@@ -108,9 +109,15 @@ async def zodiac(ctx, *args):
 @bot.command(name='echo')
 async def echo(ctx, *args):
     await ctx.message.delete()
-    me = bot.get_user(278589912184258562)
-    if ctx.message.author == me:
-        await ctx.send(' '.join(args).strip('`'))
+    if not args:
+        return
+    me = 278589912184258562
+    if ctx.message.author.id == me:
+        if args[0].startswith("<#"):
+            channel = bot.get_channel(int(args[0][2:-1]))
+            await channel.send(' '.join(args[1:]))
+        else:
+            await ctx.send(' '.join(args).strip('`'))
 
 @bot.command(name='waluigi', aliases=['wah', 'w'])
 async def waluigi(ctx, *args):
@@ -178,6 +185,14 @@ async def moving_out_completion(ctx, *args):
 @bot.command(name='mooupdate')
 async def moving_out_update(ctx, *args):
     await MovingOut.moo.update_completion(ctx, args)
+
+@bot.command(name='bee', aliases=['b'])
+async def spelling_bee_wrapper(ctx, *args):
+    await SpellingBee.bee.spelling_bee(ctx, args)
+
+@bot.command(name='beelb', aliases=['blb'])
+async def spelling_bee_lb_wrapper(ctx, *args):
+    await SpellingBee.bee.bee_leaderboards(ctx, args)
 
 @bot.event
 async def on_message(message):

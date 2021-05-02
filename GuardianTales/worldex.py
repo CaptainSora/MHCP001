@@ -75,9 +75,11 @@ BP_TYPES = [
     'Blank from Implantable', 'Blank from Small', 'Blank from Thin'
 ]
 WEEKDAYS = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-    'Friday', 'Saturday', 'Sunday'
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+    'Friday', 'Saturday'
 ]
+
+STAGE_CAP = 14
 
 def stage_rewards(inventory, stagenum, boosted=True, first_clear=False):
     """
@@ -143,10 +145,12 @@ def score(inventory, verbose=False):
     return (solver.Objective().Value(), crafted)
 
 def plan(inventory, depth=3, start_day=-1, max_stage=1):
+    # start_day is weekday:
+    # Sun = 0, Mon = 1, ..., Sat = 6
     # defaults
     depth = max(1, min(7, depth))
     if start_day < 0 or start_day >= 7:
-        start_day = datetime.now(timezone.utc).weekday()
+        start_day = (datetime.now(timezone.utc).weekday() + 1) % 7
     max_stage = max(1, min(max_stage, len(REWARDS)))
     # try all possibilities
     branches = {tuple(inventory): []}
@@ -155,8 +159,11 @@ def plan(inventory, depth=3, start_day=-1, max_stage=1):
         newbranches = {}
         for inven, hist in branches.items():
             for s in range(max(max_stage, max(hist + [-1]) + 2)):
+                # don't test past cap
+                if s >= STAGE_CAP:
+                    break
                 # don't bother testing unboosted
-                if cur_day < 5 and (s + cur_day) % 2 == 1:
+                if cur_day < 6 and (s + cur_day) % 2 == 0:
                     continue
                 first_clear = (s + 1 >= max_stage) and (s > max(hist + [-1]))
                 new_inven = stage_rewards(inven, s, first_clear=first_clear)
@@ -192,5 +199,5 @@ def plan(inventory, depth=3, start_day=-1, max_stage=1):
 
 
 # [Flat, Round, Thick, Implantable, Small, Thin, Blank, Clay, Circuit, Dye]
-# plan([0, 12, 0, 0, 0, 0, 0, 0, 1, 41], depth=7, start_day=5, max_stage=10)
-plan([0, 0, 0, 0, 0, 0, 0, 10, 1, 20], depth=7, start_day=6, max_stage=12)
+plan([0, 6, 0, 0, 0, 12, 0, 30, 0, 33], depth=7, start_day=6, max_stage=13)
+plan([0, 0, 0, 0, 0, 0, 0, 5, 6, 13], depth=7, start_day=6, max_stage=15)

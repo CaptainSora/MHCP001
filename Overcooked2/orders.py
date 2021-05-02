@@ -1,20 +1,23 @@
-def one_order(seq, prob=1):
+def one_order(seq, prob=1, index=False):
     """
     Calculates probabilities for one new order.
     Returns a dictionary of new sequences and probabilities given a sequence
     and its probability.
     """
     # seq: tuple of ints
-    # returns: dict of tuple:float
+    # returns: dict of tuple:float or int:float
     odds = [max(0, (sum(seq)+2)/len(seq) - i) for i in seq]
     prob_list = [o/sum(odds) for o in odds]
     newseqs = {}
     for i, p in enumerate(prob_list):
         if p == 0:
             continue
-        newseq = list(seq)
-        newseq[i] += 1
-        newseqs[tuple(newseq)] = prob * p
+        if index:
+            newseqs[i] = prob * p
+        else:
+            newseq = list(seq)
+            newseq[i] += 1
+            newseqs[tuple(newseq)] = prob * p
     return newseqs
 
 def sequence_prediction(recipes, depth, start):
@@ -45,6 +48,32 @@ def sequence_prediction(recipes, depth, start):
         dists = newdists
         curdepth += 1
     return dists
+
+def sequence_distribution(recipes, length, start=None):
+    """
+    Returns every possible menu continuation from start and its probability.
+    """
+    if start is None:
+        start = [0 for _ in recipes]
+    elif len(start) != len(recipes):
+        print("Initial orders do not line up with recipes!")
+        return False
+    dists = {(tuple(start), tuple()): 1}
+    curdepth = sum(start)
+    while curdepth < length:
+        newdists = {}
+        for dist, prob in dists.items():
+            next_seqs = one_order(dist[0], prob=prob, index=True)
+            for i, p in next_seqs.items():
+                new_dist = list(dist[0])
+                new_dist[i] += 1
+                orders = list(dist[1]) + list(recipes[i])
+                newdists[(tuple(new_dist), tuple(orders))] = p
+        dists = newdists
+        curdepth += 1
+    return dists
+
+print(sequence_distribution(['C', 'P', 'CP'], 3))
 
 
 def matches(aggr, seq):
@@ -113,6 +142,7 @@ def menu_dist(recipes, depth, start=None, aggr=None):
 # start: where to begin probability calculations (tuple of int)
 # aggr: types of menus to group together (list of (tuple of int))
 
+menu_dist(3, 16)
 menu_dist(3, 17)
 menu_dist(3, 18)
 menu_dist(3, 19)
@@ -227,7 +257,7 @@ def target_menu_probability(recipes, served, visible, target,
 # detailed: if you want detailed breakdown of each possibility
 
 target_menu_probability(
-    3, 21, 22, (8, 8, 'x'), final_orders=2, start=(0, 0, 0),
+    3, 18, 19, (7, 7, 'x'), final_orders=2, start=(0, 0, 0),
     exact=False, detailed=True
 )
 
