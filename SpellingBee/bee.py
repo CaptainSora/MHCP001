@@ -10,20 +10,13 @@ WORDS = None
 def load_words():
     global WORDS
     if WORDS is None:
-        with open('SpellingBee/words_alpha.txt') as f:
-            WORDS = set(f.read().split('\n'))
+        with open('SpellingBee/scrabble_words.txt') as f:
+            WORDS = set([w.lower() for w in f.read().split('\n')])
 
-def valid_letters(letters):
-    vowels = 'aeiou'
-    vowels_ext = 'aeiouy'
-    uncommon = 'fhvwyjxqz'
-    rare = 'jxqz'
-    return all(
-        sum([l in vowels for l in letters]) >= 2,
-        sum([l in vowels_ext for l in letters]) <= 3,
-        sum([l in uncommon for l in letters]) <= 2,
-        sum([l in rare for l in letters]) <= 1
-    )
+def num_valid_words(letters):
+    valid = [w for w in WORDS if letters[0] in w and len(w) >= 4]
+    valid = [w for w in valid if all([l in letters for l in w])]
+    return(len(valid))
 
 
 def todays_words():
@@ -35,9 +28,9 @@ def todays_words():
         bee = load(f)
     today_str = datetime.now(tz=timezone.utc).strftime("%b %d, %Y")
     if today_str not in bee:
-        letters = random.sample(ascii_lowercase, 7)
-        while not valid_letters(letters):
-            letters = random.sample(ascii_lowercase, 7)
+        letters = sample(ascii_lowercase, 7)
+        while num_valid_words(letters) < 30:
+            letters = sample(ascii_lowercase, 7)
         bee[today_str] = {
             'letters': letters,
             'answers': [],
@@ -115,9 +108,8 @@ async def spelling_bee(ctx, args):
             )
         elif guess not in WORDS:
             embed.description = (
-                "Your answer is not in the word list...\n"
-                "If you think this is a mistake, contact "
-                "<@278589912184258562>!"
+                "Your answer is not in the official Scrabble word list... "
+                "Sorry!"
             )
         else:
             embed.color = 0xfccf03 # Yellow
@@ -128,6 +120,8 @@ async def spelling_bee(ctx, args):
                 f"Submitted the word '{guess}'!"
             )
     if answers:
+        maxlen = max([len(w) for w in answers])
+        answers = [f"__{w}__" if len(w) == maxlen else w for w in answers]
         embed.add_field(
             name="Submitted:",
             value='\n'.join(answers)
@@ -144,10 +138,9 @@ async def spelling_bee(ctx, args):
     await ctx.send(embed=embed)
 
 async def bee_leaderboards(ctx, args):
-    letters, answers, players, today_str = todays_words()
     embed=Embed(
         title=(
-            "Today's Leaderboard"
+            "Leaderboard"
         ),
         color=0xfccf03 # Yellow
     )
@@ -158,7 +151,23 @@ async def bee_leaderboards(ctx, args):
             "838483537685774376/1.png"
         )
     )
-    embed.set_footer(text=today_str)
+    # Check date
+    if args:
+        date = ' '.join(args)
+    else:
+        date = datetime.now(tz=timezone.utc).strftime("%b %d, %Y")
+    with open('SpellingBee/bee.json') as f:
+        hist = load(f)
+    if date not in hist:
+        embed.description = (
+            f"No records for {date}.\n"
+            "Try formatting it as 'Jan 01, 2021'?"
+        )
+        await ctx.send(embed=embed)
+        return
+    embed.set_footer(text=date)
+    answers = hist[date]['answers']
+    players = hist[date]['players']
     if not answers:
         embed.add_field(
             name="No submissions yet!",
