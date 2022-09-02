@@ -3,7 +3,7 @@ from json import load
 from os import getenv
 from random import choice
 
-from discord import Activity, ActivityType, Embed, File, Status
+from discord import Activity, ActivityType, Embed, Intents, Status
 from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import Apps.dl_emotes
 import Apps.profile
 import DG.archery
+import LoveLetter.loveletter
 import MovingOut.moo
 import Overcooked2.oc2
 import SpellingBee.bee
@@ -21,7 +22,14 @@ from Help.help import help_page
 load_dotenv()
 API_ACCESS = getenv('API_ACCESS')
 
-bot = commands.Bot(command_prefix='.')
+activity = Activity(
+    name="Love Letter",
+    type=ActivityType.playing)
+
+intents = Intents.all()
+
+bot = commands.Bot(command_prefix='.', activity=activity, intents=intents)
+
 bot.remove_command('help')
 
 dict_ready = False
@@ -32,12 +40,6 @@ async def on_ready():
     print(
         f"{bot.user.name} is here to fix bugs and cause chaos. And she's"
         f" all out of bugs."
-    )
-    await bot.change_presence(
-        activity=Activity(
-            name="your mental health | .help",
-            type=ActivityType.watching
-        )
     )
     with open('Apps/emote.json') as f:
         emote_dict = load(f)
@@ -98,9 +100,9 @@ async def logout(ctx):
     await ctx.send("Logging off. Goodnight!")
     await bot.logout()
 
-@bot.command(name='roster')
-async def roster(ctx):
-    await GuardianTales.scarecrow.get_roster(ctx)
+# @bot.command(name='roster')
+# async def roster(ctx):
+#     await GuardianTales.scarecrow.get_roster(ctx)
 
 @bot.command(name='zodiac', aliases=['date', 'z'])
 async def zodiac(ctx, *args):
@@ -151,9 +153,13 @@ async def seasonal_help_text(ctx, *args):
     )
     await ctx.send(helptext)
 
+mind = None
+
 @bot.command(name='mind')
 async def start_mind(ctx, *args):
-    mind = bot.get_channel(821751349049425951)
+    global mind
+    # mind = bot.get_channel(821751349049425951)
+    mind = ctx.message.channel
     players = [] # List of User objects
     dms = [] # List of DMChannel objects
     hardmode = False
@@ -161,8 +167,10 @@ async def start_mind(ctx, *args):
         if a.lower() in ['hard', 'hardmode', 'h']:
             hardmode = True
         elif a[:2] == "<@":
-            user = bot.get_user(int(a.lstrip("<@!").rstrip(">")))
+            # user = bot.get_user(int(a.lstrip("<@!").rstrip(">")))
+            user = await bot.fetch_user(int(a.lstrip("<@!").rstrip(">")))
             if user is None:
+                print("Cannot find user")
                 break
             players.append(user)
             dm_ch = user.dm_channel
@@ -177,6 +185,46 @@ async def start_mind(ctx, *args):
             dm_ch = await author.create_dm()
         dms.insert(0, dm_ch)
     await TheMind.mind.game_starter(mind, players, dms, hardmode)
+
+@bot.command(name='loveletter', aliases=['ll', 'love', 'letter'])
+async def start_ll(ctx, *args):
+    async def wait_fn(check):
+        """
+        Wrapper for bot.wait_for
+        """
+        return await bot.wait_for('reaction_add', check=check)
+    
+    players = [] # List of User objects
+    dms = [] # List of DMChannel objects
+    flags = []
+    for a in args:
+        if a[:2] == "<@":
+            user = await bot.fetch_user(int(a.lstrip("<@!").rstrip(">")))
+            if user is None:
+                print("Cannot find user")
+                break
+            if user in players:
+                continue
+            players.append(user)
+            dm_ch = user.dm_channel
+            if dm_ch is None:
+                dm_ch = await user.create_dm()
+            dms.append(dm_ch)
+        elif a[0] == "-":
+            flags.append(a)
+    author = ctx.message.author
+    if author not in players:
+        players.insert(0, author)
+        dm_ch = author.dm_channel
+        if dm_ch is None:
+            dm_ch = await author.create_dm()
+        dms.insert(0, dm_ch)
+    if len(players) < 2 or len(players) > 6:
+        ctx.send("Requires 2-6 players!")
+    else:
+        await LoveLetter.loveletter.game_starter(
+            players, dms, ctx, wait_fn, flags
+        )
 
 @bot.command(name='moo')
 async def moving_out_completion(ctx, *args):
@@ -196,8 +244,9 @@ async def spelling_bee_lb_wrapper(ctx, *args):
 
 @bot.event
 async def on_message(message):
+    global mind
     archery = bot.get_channel(808155589385125898)
-    mind = bot.get_channel(821751349049425951)
+    # mind = bot.get_channel(821751349049425951)
     me = bot.get_user(278589912184258562)
     if message.author == bot.user:
         # Checks for messages sent by itself
@@ -246,6 +295,7 @@ async def on_message(message):
                 if k == 'unicode':
                     await message.add_reaction(chr(int(v, base=16)))
                 elif k == 'name':
+                    # For custom emojis
                     emoji = get(bot.emojis, name=v)
                     await message.add_reaction(emoji)
 

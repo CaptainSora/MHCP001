@@ -151,6 +151,7 @@ def highscore(value, path):
     for p in path:
         obj = obj[p]
     if not isinstance(obj, (int, str)):
+        print("Path does not lead to int or str object.")
         return False
 
     if len(path) == 2:
@@ -162,6 +163,7 @@ def highscore(value, path):
     elif len(path) == 5:
         stars[path[0]][path[1]][path[2]][path[3]][path[4]] = value
     else:
+        print("Path length not between 2 and 5.")
         return False
     
     with open('Overcooked2/highscores.json', 'w') as f:

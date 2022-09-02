@@ -10,7 +10,7 @@ WORDS = None
 def load_words():
     global WORDS
     if WORDS is None:
-        with open('SpellingBee/scrabble_words.txt') as f:
+        with open('SpellingBee/twl06.txt') as f:
             WORDS = set([w.lower() for w in f.read().split('\n')])
 
 def num_valid_words(letters):
@@ -124,11 +124,11 @@ async def spelling_bee(ctx, args):
         answers = [f"__{w}__" if len(w) == maxlen else w for w in answers]
         embed.add_field(
             name="Submitted:",
-            value='\n'.join(answers)
+            value='\n'.join(answers[-30:])
         )
         embed.add_field(
             name="By:",
-            value='\n'.join(players_str)
+            value='\n'.join(players_str[-30:])
         )
         embed.add_field(
             name="Total:",
@@ -140,7 +140,7 @@ async def spelling_bee(ctx, args):
 async def bee_leaderboards(ctx, args):
     embed=Embed(
         title=(
-            "Leaderboard"
+            "Leaderboard Archive"
         ),
         color=0xfccf03 # Yellow
     )
@@ -156,12 +156,20 @@ async def bee_leaderboards(ctx, args):
         date = ' '.join(args)
     else:
         date = datetime.now(tz=timezone.utc).strftime("%b %d, %Y")
+        embed.title = "Today's Leaderboard"
+        embed.description = (
+            "Enter a date to see that day's leaderboards!"
+        )
     with open('SpellingBee/bee.json') as f:
         hist = load(f)
     if date not in hist:
+        record_dates = list(hist.keys())
+        if len(record_dates) > 10:
+            record_dates = record_dates[:5] + ["..."] + record_dates[-5:]
         embed.description = (
-            f"No records for {date}.\n"
-            "Try formatting it as 'Jan 01, 2021'?"
+            f"No records for '{date}'.\n"
+            "Existing records:\n"
+            f"{chr(10).join(record_dates)}"
         )
         await ctx.send(embed=embed)
         return

@@ -20,6 +20,7 @@ Core mechanic:
             Buffs/heals can be given to specific teams
             Backline can still debuff if it's not direct damage
     Status conditions???
+        [Conditions should have some percentage infliction like GT]
         LIMIT TO ONLY A FEW THANKS
         Frozen increases physical damage taken (percentage of incoming damage)
         Bleeding increases magic damage taken (percentage of incoming damage)
@@ -40,6 +41,11 @@ Core mechanic:
         Doom has a chance to cause instant death after certain TU or turns
         Enemies can have resistances to certain status conditions
             i.e. probabilistically resisting status conditions
+        Overloaded - decreases move speed, atk speed, etc
+    Passive abilities:
+        Phantom power
+            When overloaded, increases stats instead of decreases
+    Battle conditions (like weather)
     Stats:
         PAtk (Power) PWR
         MAtk (Intellect) INT or Wisdom WIS
@@ -113,4 +119,6 @@ Exploration like "A Dark Room"
         First paths which progress by usage, then costs (a lot) for upgrading
             See https://www.youtube.com/watch?v=PIK6I6Q58Ec
     Differing move speed per unit (tiles per day)
-    Emergency rations which are heavy but allow 
+    Emergency rations which are heavy but allow for rescue
+
+Minor automation of merchants + units
