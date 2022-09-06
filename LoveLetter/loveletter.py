@@ -1,14 +1,10 @@
-from asyncio import create_task
 from random import shuffle
 
 from discord import Embed
 
-""" TODO
-- Mobile formatting????
-? Automatic no-target
-? Send separate messages to dead players? (game flag)
-? Announce all cards when deck runs out
-? Instructions: each turn...
+""" Future Plans
+- More flags?
+- Handle more than one instance at a time
 - Help function (for bot commands/flags)
 """
 
@@ -31,7 +27,7 @@ class LoveLetter:
         self.handmaid = [0 for _ in self.players]
         self.tokens = [0 for _ in self.players]
         self.turn = 0
-        # GAME VALUES
+        # Game values
         self.deck = []
         self.discard = []
         self.names = {
@@ -108,6 +104,12 @@ class LoveLetter:
             name="Players",
             value="\n".join([
                 f"{p[0]}. {p[1].mention}" for p in enumerate(self.players, 1)
+            ])
+        )
+        embed.add_field(
+            name="Flags",
+            value="\n".join([
+                f"Show cards when eliminated (-di): {self.deadinfo}",
             ])
         )
         await self.send_embed(embed)
@@ -189,12 +191,14 @@ class LoveLetter:
             )
             # Player cards (only shown to dead players)
             if self.deadinfo and self.cards[i] == -1:
+                cardemojis = [
+                    self.names[c].split()[0] if c > -1 else "⠀"
+                    for c in self.cards
+                ]
+                cardemojis[self.turn] += self.names[self.deck[-1]].split()[0]
                 embed.add_field(
                     name="Cards",
-                    value="\n".join([
-                        self.names[c].split()[0] if c > -1 else "⠀"
-                        for c in self.cards
-                    ])
+                    value="\n".join(cardemojis)
                 )
             # Remaining cards
             embed.add_field(
@@ -900,7 +904,7 @@ async def game_starter(players, dms, ctx, wait_fn, flags):
             "Game already in progress! Unfortunately, Yui can only handle "
             "one game instance at a time..."
         )
-        
+
 
 async def delete_game(ctx):
     global GAME

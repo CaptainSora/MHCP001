@@ -14,6 +14,7 @@ import DG.archery
 import LoveLetter.loveletter
 import MovingOut.moo
 import Overcooked2.oc2
+import RedFlags.redflags
 import SpellingBee.bee
 import TheMind.mind
 import Zodiac.zodiac
@@ -223,6 +224,46 @@ async def start_ll(ctx, *args):
         ctx.send("Requires 2-6 players!")
     else:
         await LoveLetter.loveletter.game_starter(
+            players, dms, ctx, wait_fn, flags
+        )
+
+@bot.command(name='redflags', aliases=['rf', 'redflag', 'redf'])
+async def start_ll(ctx, *args):
+    async def wait_fn(check):
+        """
+        Wrapper for bot.wait_for
+        """
+        return await bot.wait_for('reaction_add', check=check)
+    
+    players = [] # List of User objects
+    dms = [] # List of DMChannel objects
+    flags = []
+    for a in args:
+        if a[:2] == "<@":
+            user = await bot.fetch_user(int(a.lstrip("<@!").rstrip(">")))
+            if user is None:
+                print("Cannot find user")
+                break
+            if user in players:
+                continue
+            players.append(user)
+            dm_ch = user.dm_channel
+            if dm_ch is None:
+                dm_ch = await user.create_dm()
+            dms.append(dm_ch)
+        elif a[0] == "-":
+            flags.append(a)
+    author = ctx.message.author
+    if author not in players:
+        players.insert(0, author)
+        dm_ch = author.dm_channel
+        if dm_ch is None:
+            dm_ch = await author.create_dm()
+        dms.insert(0, dm_ch)
+    if len(players) < 3 or len(players) > 9:
+        ctx.send("Requires 3-9 players!")
+    else:
+        await RedFlags.redflags.game_starter(
             players, dms, ctx, wait_fn, flags
         )
 

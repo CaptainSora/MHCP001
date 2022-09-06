@@ -1,0 +1,9 @@
+__Welcome to *Red Flags*!__
+
+In this game, you will take turns designing the perfect date for one single individual.
+You will make use of perks (white cards) to entice your single friend to pick your candidate, and use red flags (red cards) to sabotage another candidate. 
+
+As a wingman/wingwoman, pick two perks (white cards) to make your candidate more attractive to your single friend.
+After everyone picked their white cards, you will take turns sabotaging another candidate by picking a red flag (red card).
+After everyone had sabotaged each other, the single person will choose the best candidate to go on a date with, and the person who designed that candidate gets 1 point.
+The first player to earn 7 points is the winner.
